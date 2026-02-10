@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_admission_register_list" model="ir.ui.view">
+        <field name="name">admission.register.list</field>
+        <field name="model">admission.register</field>
+        <field name="arch" type="xml">
+            <list string="Admission Registers">
+                <field name="name" />
+                <field name="academic_session_id" />
+                <field name="start_date" />
+                <field name="end_date" />
+                <field name="state" 
+                       widget="badge" 
+                       decoration-info="state == 'draft'" 
+                       decoration-warning="state == 'gathering'" 
+                       decoration-danger="state == 'stopped'"
+                       decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_admission_register_form" model="ir.ui.view">
+        <field name="name">admission.register.form</field>
+        <field name="model">admission.register</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_gathering" string="Start Gathering" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <button name="action_stop_gathering" string="Stop Gathering" type="object" class="btn-danger" invisible="state != 'gathering'"/>
+                    <button name="action_merit" string="Merit Process" type="object" class="oe_highlight" invisible="state != 'stopped'"/>
+                    <button name="action_done" string="Done" type="object" class="oe_highlight" invisible="state != 'merit'"/>
+                    <button name="action_reset" string="Reset to Draft" type="object" invisible="state not in ['confirmed', 'done', 'stopped']"/>
+                    
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,gathering,stopped,merit,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" />
+                        <h1>
+                            <field name="name" placeholder="e.g. Fall Intake 2026" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Basic Details">
+                            <field name="start_date" />
+                            <field name="end_date" />
+                            <field name="academic_session_id" />
+                            <field name="academic_term_id" domain="[('session_id', '=', academic_session_id)]" />
+                            <field name="calculation_method" />
+                        </group>
+                        <group string="Requirements">
+                            <field name="dob_min" />
+                            <field name="dob_max" />
+                            <field name="min_education_year" />
+                            <field name="preferences_allowed" />
+                            
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Testing &amp; Eligibility">
+                            <field name="career_id" />
+                            <field name="test_name" />
+                            <field name="eligibility_file" widget="image" class="oe_avatar" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Programs" name="programs">
+                            <field name="program_ids">
+                                <list editable="bottom">
+                                    <field name="code" />
+                                    <field name="name" />
+                                    <field name="duration" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Applications" name="applications">
+                            <group>
+                                <p class="text-muted">Application tracking will appear here.</p>
+                            </group>
+                        </page>
+                        <page string="Undertaking" name="undertaking">
+                            <field name="undertaking"
+                                   widget="html"
+                                   options="{'collaborative': True, 'resizable': True, 'codeview': True}"
+                                   placeholder="Enter the legal undertaking terms here..." />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_admission_register" model="ir.actions.act_window">
+        <field name="name">Admission Register</field>
+        <field name="res_model">admission.register</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

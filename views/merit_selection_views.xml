@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- SEARCH VIEW (Odoo 19 SAFE) -->
+    <record id="view_merit_selection_register_search" model="ir.ui.view">
+        <field name="name">merit.selection.register.search</field>
+        <field name="model">merit.selection.register</field>
+        <field name="arch" type="xml">
+            <search>
+
+                <field name="name"/>
+                <field name="academic_session_id"/>
+                <field name="academic_term_id"/>
+                <field name="state"/>
+
+                <separator/>
+
+                <filter name="group_session"
+                        string="Group by Session"
+                        context="{'group_by':'academic_session_id'}"/>
+
+                <filter name="group_term"
+                        string="Group by Term"
+                        context="{'group_by':'academic_term_id'}"/>
+
+                <filter name="group_state"
+                        string="Group by Status"
+                        context="{'group_by':'state'}"/>
+
+            </search>
+        </field>
+    </record>
+
+
+    <!-- LIST VIEW -->
+    <record id="view_merit_selection_register_list" model="ir.ui.view">
+        <field name="name">merit.selection.register.list</field>
+        <field name="model">merit.selection.register</field>
+        <field name="arch" type="xml">
+            <list string="Master Merit Lists">
+                <field name="name"/>
+                <field name="academic_session_id"/>
+                <field name="state"
+                       widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state in ('allotted','second_list','finalized')"/>
+            </list>
+        </field>
+    </record>
+
+
+    <!-- FORM VIEW -->
+    <record id="view_merit_selection_register_form" model="ir.ui.view">
+        <field name="name">merit.selection.register.form</field>
+        <field name="model">merit.selection.register</field>
+        <field name="arch" type="xml">
+            <form string="Master Merit Selection">
+
+                <header>
+                    <button name="action_generate_merit_list"
+                            string="Calculate Rankings"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+
+                    <button name="action_allot_seats"
+                            string="Generate 1st Merit List"
+                            type="object"
+                            class="btn-success"
+                            invisible="state != 'calculated'"/>
+
+                    <button name="action_generate_second_list"
+                            string="Generate 2nd Merit List"
+                            type="object"
+                            class="btn-warning"
+                            invisible="state not in ('allotted','second_list')"
+                            confirm="This will fill empty seats with the next available students. Have you unchecked the absentees?"/>
+
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,calculated,allotted,second_list,finalized"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Title"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="academic_session_id" readonly="state != 'draft'"/>
+                            <field name="academic_term_id" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Merit Rankings">
+                            <field name="line_ids">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="rank" readonly="1"/>
+                                    <field name="applicant_id" readonly="1"/>
+                                    <field name="aggregate_score" readonly="1"/>
+                                    <field name="allotted_program_id" readonly="1"/>
+                                    <field name="is_allocated" string="Seat Confirmed"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+               
+
+            </form>
+        </field>
+    </record>
+
+
+    <!-- ACTION -->
+    <record id="action_merit_selection_register" model="ir.actions.act_window">
+        <field name="name">Master Merit List</field>
+        <field name="res_model">merit.selection.register</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_merit_selection_register_search"/>
+    </record>
+
+</odoo>

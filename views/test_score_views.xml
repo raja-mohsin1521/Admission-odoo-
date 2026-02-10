@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_admission_test_score_list" model="ir.ui.view">
+        <field name="name">admission.test.score.list</field>
+        <field name="model">admission.test.score</field>
+        <field name="arch" type="xml">
+            <list string="Test Scores" editable="bottom" decoration-danger="obtained_marks == 0" decoration-success="obtained_marks &gt; 0">
+                <field name="register_state" column_invisible="True"/>
+                <field name="application_id" readonly="1"/>
+                <field name="applicant_id" readonly="1"/>
+                <field name="test_date" readonly="1"/>
+                <field name="attendance_status" 
+                       readonly="register_state != 'stopped'" 
+                       widget="badge" 
+                       decoration-success="attendance_status == 'present'" 
+                       decoration-warning="attendance_status == 'absent'"/>
+                <field name="max_marks" readonly="register_state != 'stopped'"/>
+                <field name="obtained_marks" readonly="register_state != 'stopped'"/>
+                <field name="percentage" widget="progressbar"/>
+                 <field name="aggrigate_score"  readonly="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_admission_test_score_form" model="ir.ui.view">
+        <field name="name">admission.test.score.form</field>
+        <field name="model">admission.test.score</field>
+        <field name="arch" type="xml">
+            <form string="Test Score">
+                <sheet>
+                    <field name="register_state" invisible="1"/>
+                    <group>
+                        <group string="Application Info">
+                            <field name="application_id" readonly="1"/>
+                            <field name="applicant_id" readonly="1"/>
+                            <field name="register_id" readonly="1"/>
+                        </group>
+                        <group string="Test Details">
+                            <field name="test_date" readonly="1"/>
+                            <field name="attendance_status" readonly="register_state != 'stopped'"/>
+                        </group>
+                    </group>
+                    <group string="Results">
+                        <field name="max_marks" readonly="register_state != 'stopped'"/>
+                        <field name="obtained_marks" readonly="register_state != 'stopped'"/>
+                        <field name="percentage" widget="progressbar"/>
+                        <field name="aggrigate_score" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+ <record id="view_admission_test_score_search" model="ir.ui.view">
+    <field name="name">admission.test.score.search</field>
+    <field name="model">admission.test.score</field>
+    <field name="arch" type="xml">
+        <search string="Search Test Scores">
+
+            <!-- Basic search fields -->
+            <field name="application_id"/>
+            <field name="applicant_id"/>
+            <field name="register_id"/>
+            <field name="test_date"/>
+
+            <!-- Filters -->
+            <filter name="filter_present"
+                    string="Present"
+                    domain="[('attendance_status','=','present')]"/>
+            <filter name="filter_absent"
+                    string="Absent"
+                    domain="[('attendance_status','=','absent')]"/>
+
+            <!-- Optional grouping for filter layout -->
+            <group>
+                <!-- Group By register -->
+                <filter name="group_register"
+                        string="Group by Register"
+                        context="{'group_by':'register_id'}"/>
+            </group>
+
+        </search>
+    </field>
+</record>
+
+
+
+    <record id="action_admission_test_score" model="ir.actions.act_window">
+        <field name="name">Test Scores</field>
+        <field name="res_model">admission.test.score</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_admission_test_score_search"/>
+    </record>
+</odoo>

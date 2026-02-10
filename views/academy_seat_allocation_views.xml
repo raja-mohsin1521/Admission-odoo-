@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_academy_seat_allocation_list" model="ir.ui.view">
+        <field name="name">academy.seat.allocation.list</field>
+        <field name="model">academy.seat.allocation</field>
+        <field name="arch" type="xml">
+            <list string="Seat Allocations">
+                <field name="name"/>
+                <field name="academic_session_id"/>
+                <field name="academic_term_id"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_academy_seat_allocation_form" model="ir.ui.view">
+        <field name="name">academy.seat.allocation.form</field>
+        <field name="model">academy.seat.allocation</field>
+        <field name="arch" type="xml">
+            <form string="Seat Allocation">
+                <header>
+                    <button name="action_confirm" string="Confirm Allocation" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Allocation Title"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="academic_session_id" readonly="state != 'draft'"/>
+                            <field name="academic_term_id" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Program Allocation" name="program_allocation">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="program_id" readonly="1" force_save="1"/>
+                                    <field name="total_seats"/>
+                                    <field name="opening_merit"/>
+                                    <field name="closing_merit"/>
+                                    <field name="occupied_seats"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+              
+            </form>
+        </field>
+    </record>
+
+    <record id="action_academy_seat_allocation" model="ir.actions.act_window">
+        <field name="name">Seat Allocation</field>
+        <field name="res_model">academy.seat.allocation</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+  
+</odoo>

@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="report_fee_voucher_action" model="ir.actions.report">
+        <field name="name">Admission Fee Voucher</field>
+        <field name="model">student.application</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo19_academy.report_fee_voucher_template</field>
+        <field name="report_file">odoo19_academy.report_fee_voucher_template</field>
+        <field name="print_report_name">'Voucher_%s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_student_application" />
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_fee_voucher_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-set="config" t-value="env['ir.config_parameter'].sudo()" />
+                    <t t-set="fee"
+                        t-value="float(config.get_param('odoo19_academy.admission_fee') or 0.0)" />
+                    <t t-set="bank1"
+                        t-value="config.get_param('odoo19_academy.bank_account_title_1')" />
+                    <t t-set="bank2"
+                        t-value="config.get_param('odoo19_academy.bank_account_title_2')" />
+                    <t t-set="bank3"
+                        t-value="config.get_param('odoo19_academy.bank_account_title_3')" />
+
+                    <style>
+                        .voucher-container {
+                            font-family: "Segoe UI", Arial, sans-serif;
+                            color: #2c3e50;
+                            font-size: 14px;
+                            padding: 10px 5px;
+                        }
+
+                        .page {
+                            page-break-after: always;
+                        }
+
+                        .page:last-child {
+                            page-break-after: avoid;
+                        }
+
+                        .voucher-header {
+                            text-align: center;
+                            margin-bottom: 25px;
+                            padding-bottom: 15px;
+                            border-bottom: 3px double #3498db;
+                        }
+
+                        .voucher-title {
+                            font-size: 28px;
+                            font-weight: 700;
+                            text-transform: uppercase;
+                            letter-spacing: 2px;
+                            margin: 0;
+                        }
+
+                        .academic-session {
+                            font-size: 16px;
+                            color: #6c757d;
+                            margin-top: 5px;
+                        }
+
+                        .copy-title {
+                            text-align: center;
+                            font-size: 18px;
+                            font-weight: bold;
+                            margin: 15px 0;
+                            padding: 8px;
+                            background-color: #f0f8ff;
+                            border-radius: 4px;
+                        }
+
+                        .bank-info {
+                            border: 1.5px solid #dcdcdc;
+                            border-radius: 6px;
+                            padding: 14px;
+                            margin: 20px 0 25px 0;
+                            text-align: center;
+                            background-color: #f8f9fa;
+                        }
+
+                        .bank-title {
+                            font-weight: 700;
+                            font-size: 15px;
+                            margin-bottom: 8px;
+                        }
+
+                        .bank-account {
+                            font-size: 14px;
+                            line-height: 1.6;
+                        }
+
+                        .info-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 25px;
+                            border: 1.5px solid #dcdcdc;
+                        }
+
+                        .info-table th,
+                        .info-table td {
+                            border: 1px solid #dcdcdc;
+                            padding: 10px;
+                            text-align: center;
+                            vertical-align: middle;
+                        }
+
+                        .info-table th {
+                            background-color: #3498db;
+                            color: #fff;
+                            font-weight: 600;
+                            font-size: 14px;
+                        }
+
+                        .info-table td {
+                            font-size: 14px;
+                            font-weight: 500;
+                        }
+
+                        .info-label {
+                            background-color: #eef6ff;
+                            font-weight: 600;
+                        }
+
+                        .amount-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            border: 1.5px solid #dcdcdc;
+                            margin-top: 10px;
+                        }
+
+                        .amount-table th,
+                        .amount-table td {
+                            border: 1px solid #dcdcdc;
+                            padding: 14px;
+                            text-align: center;
+                            vertical-align: middle;
+                        }
+
+                        .amount-table thead th {
+                            background-color: #2c3e50;
+                            color: white;
+                            font-size: 15px;
+                            font-weight: 700;
+                            text-align: center;
+                            vertical-align: middle;
+                        }
+
+                        .amount-table td {
+                            font-size: 15px;
+                        }
+
+                        .amount-cell {
+                            font-weight: 700;
+                            color: #27ae60;
+                            text-align: center;
+                            vertical-align: middle;
+                        }
+
+                        .total-row td {
+                            font-weight: 700;
+                            background-color: #f2f2f2;
+                            font-size: 16px;
+                            text-align: center;
+                            vertical-align: middle;
+                        }
+
+                        .footer-note {
+                            text-align: center;
+                            margin-top: 35px;
+                            font-size: 12px;
+                            color: #7f8c8d;
+                            border-top: 1px dashed #ccc;
+                            padding-top: 10px;
+                        }
+
+                        .signature-section {
+                            margin-top: 50px;
+                            display: table;
+                            width: 100%;
+                        }
+
+                        .signature-box {
+                            display: table-cell;
+                            text-align: center;
+                            padding-top: 30px;
+                            border-top: 1px solid #999;
+                            font-size: 13px;
+                            width: 50%;
+                        }
+
+                        @media print {
+                            * {
+                                -webkit-print-color-adjust: exact;
+                                color-adjust: exact;
+                            }
+                        }
+                    </style>
+
+                    <!-- First Page: Bank Copy -->
+                    <div class="page">
+                        <div class="container voucher-container">
+                            
+<div class="row">
+    <div class="col-5 "> 
+        <div class="voucher-header">
+                                <div class="voucher-title">Admission Fee Voucher</div>
+                                <div class="academic-session">
+                                    <span t-field="o.academic_session_id" />
+                                </div>
+                            </div>
+        
+        <div class="copy-title">BANK COPY</div>
+
+                            <div class="bank-info text-center">
+                                <div class="bank-title">Bank Accounts for Payment</div>
+                                <div class="bank-account">
+                                    <span t-if="bank1">
+                                        <t t-esc="bank1" />
+                                        <br />
+                                    </span>
+                                    <span t-if="bank2">
+                                        <t t-esc="bank2" />
+                                        <br />
+                                    </span>
+                                    <span t-if="bank3">
+                                        <t t-esc="bank3" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Student Information Table -->
+                            <table class="info-table">
+                                <tr>
+                                    <th>Student Name</th>
+                                    <td>
+                                        <strong>
+                                            <t t-esc="o.applicant_id.name" />
+                                            <t t-esc="o.applicant_id.last_name" />
+                                        </strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>CNIC</th>
+                                    <td>
+                                        <t t-esc="o.cnic" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Application No</th>
+                                    <td>
+                                        <t t-esc="o.id" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Date</th>
+                                    <td>
+                                        <t t-esc="time.strftime('%Y-%m-%d')" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Due Date</th>
+                                    <td>
+                                        <t t-esc="time.strftime('%Y-%m-%d')" />
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Fee Details Table -->
+                            <table class="amount-table">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Amount (PKR)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Admission Processing Fee</td>
+                                        <td class="amount-cell">
+                                            <span t-esc="config.get_param('odoo19_academy.admission_fee', '0.0')" />
+                                        </td>
+                                    </tr>
+                                    <tr class="total-row">
+                                        <td>
+                                            <strong>Total Amount</strong>
+                                        </td>
+                                        <td class="amount-cell">
+                                            <strong>
+                                                <span t-esc="config.get_param('odoo19_academy.admission_fee', '0.0')" />
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Footer Notes -->
+                            <div style="margin-top: 40px; padding: 20px; border-top: 2px dashed #dee2e6;">
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6c757d;">
+                                    <div style="flex: 1;">
+                                        <strong>Payment Instructions:</strong>
+                                        <br />
+                                        <p>In case of any fee related issue please contact
+                                            Admission Office.<br /> Note: This is computer
+                                            generated document and need no signature.</p>
+                                    </div>
+                                </div>
+                            </div>
+    </div>
+    <div class="col-5 offset-2"> 
+        <div class="voucher-header">
+                                <div class="voucher-title">Admission Fee Voucher</div>
+                                <div class="academic-session">
+                                    <span t-field="o.academic_session_id" />
+                                </div>
+                            </div>
+
+        <div class="copy-title">TREASURY COPY</div>
+
+                            <div class="bank-info text-center">
+                                <div class="bank-title">Bank Accounts for Payment</div>
+                                <div class="bank-account">
+                                    <span t-if="bank1">
+                                        <t t-esc="bank1" />
+                                        <br />
+                                    </span>
+                                    <span t-if="bank2">
+                                        <t t-esc="bank2" />
+                                        <br />
+                                    </span>
+                                    <span t-if="bank3">
+                                        <t t-esc="bank3" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Student Information Table -->
+                            <table class="info-table">
+                                <tr>
+                                    <th>Student Name</th>
+                                    <td>
+                                        <strong>
+                                            <t t-esc="o.applicant_id.name" />
+                                            <t t-esc="o.applicant_id.last_name" />
+                                        </strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>CNIC</th>
+                                    <td>
+                                        <t t-esc="o.cnic" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Application No</th>
+                                    <td>
+                                        <t t-esc="o.id" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Date</th>
+                                    <td>
+                                        <t t-esc="time.strftime('%Y-%m-%d')" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Due Date</th>
+                                    <td>
+                                        <t t-esc="time.strftime('%Y-%m-%d')" />
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Fee Details Table -->
+                            <table class="amount-table">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Amount (PKR)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Admission Processing Fee</td>
+                                        <td class="amount-cell">
+                                            <span t-esc="config.get_param('odoo19_academy.admission_fee', '0.0')" />
+                                        </td>
+                                    </tr>
+                                    <tr class="total-row">
+                                        <td>
+                                            <strong>Total Amount</strong>
+                                        </td>
+                                        <td class="amount-cell">
+                                            <strong>
+                                                <span t-esc="config.get_param('odoo19_academy.admission_fee', '0.0')" />
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Footer Notes -->
+                            <div style="margin-top: 40px; padding: 20px; border-top: 2px dashed #dee2e6;">
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6c757d;">
+                                    <div style="flex: 1;">
+                                        <strong>Payment Instructions:</strong>
+                                        <br />
+                                        <p>In case of any fee related issue please contact
+                                            Admission Office.<br /> Note: This is computer
+                                            generated document and need no signature.</p>
+                                    </div>
+                                </div>
+                            </div>
+    </div>
+</div>
+                          
+                        </div>
+                    </div>
+
+                    <!-- Second Page: Student Copy -->
+                    <div class="page">
+                        <div class="container voucher-container">
+                            
+<div class="row">
+    <div class="col-5"> 
+        <div class="voucher-header">
+                                <div class="voucher-title">Admission Fee Voucher</div>
+                                <div class="academic-session">
+                                    <span t-field="o.academic_session_id" />
+                                </div>
+                            </div>
+        
+        <div class="copy-title">ADMISSION COPY</div>
+
+                            <div class="bank-info text-center">
+                                <div class="bank-title">Bank Accounts for Payment</div>
+                                <div class="bank-account">
+                                    <span t-if="bank1">
+                                        <t t-esc="bank1" />
+                                        <br />
+                                    </span>
+                                    <span t-if="bank2">
+                                        <t t-esc="bank2" />
+                                        <br />
+                                    </span>
+                                    <span t-if="bank3">
+                                        <t t-esc="bank3" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Student Information Table -->
+                            <table class="info-table">
+                                <tr>
+                                    <th>Student Name</th>
+                                    <td>
+                                        <strong>
+                                            <t t-esc="o.applicant_id.name" />
+                                            <t t-esc="o.applicant_id.last_name" />
+                                        </strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>CNIC</th>
+                                    <td>
+                                        <t t-esc="o.cnic" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Application No</th>
+                                    <td>
+                                        <t t-esc="o.id" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Date</th>
+                                    <td>
+                                        <t t-esc="time.strftime('%Y-%m-%d')" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Due Date</th>
+                                    <td>
+                                        <t t-esc="time.strftime('%Y-%m-%d')" />
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Fee Details Table -->
+                            <table class="amount-table">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Amount (PKR)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Admission Processing Fee</td>
+                                        <td class="amount-cell">
+                                            <span t-esc="config.get_param('odoo19_academy.admission_fee', '0.0')" />
+                                        </td>
+                                    </tr>
+                                    <tr class="total-row">
+                                        <td>
+                                            <strong>Total Amount</strong>
+                                        </td>
+                                        <td class="amount-cell">
+                                            <strong>
+                                                <span t-esc="config.get_param('odoo19_academy.admission_fee', '0.0')" />
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Footer Notes -->
+                            <div style="margin-top: 40px; padding: 20px; border-top: 2px dashed #dee2e6;">
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6c757d;">
+                                    <div style="flex: 1;">
+                                        <strong>Payment Instructions:</strong>
+                                        <br />
+                                        <p>In case of any fee related issue please contact
+                                            Admission Office.<br /> Note: This is computer
+                                            generated document and need no signature.</p>
+                                    </div>
+                                </div>
+                            </div>
+    </div>
+    <div class="col-5 offset-2"> 
+        <div class="voucher-header">
+                                <div class="voucher-title">Admission Fee Voucher</div>
+                                <div class="academic-session">
+                                    <span t-field="o.academic_session_id" />
+                                </div>
+                            </div>
+        
+        <div class="copy-title">STUDENT COPY</div>
+
+                            <div class="bank-info text-center">
+                                <div class="bank-title">Bank Accounts for Payment</div>
+                                <div class="bank-account">
+                                    <span t-if="bank1">
+                                        <t t-esc="bank1" />
+                                        <br />
+                                    </span>
+                                    <span t-if="bank2">
+                                        <t t-esc="bank2" />
+                                        <br />
+                                    </span>
+                                    <span t-if="bank3">
+                                        <t t-esc="bank3" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Student Information Table -->
+                            <table class="info-table">
+                                <tr>
+                                    <th>Student Name</th>
+                                    <td>
+                                        <strong>
+                                            <t t-esc="o.applicant_id.name" />
+                                            <t t-esc="o.applicant_id.last_name" />
+                                        </strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>CNIC</th>
+                                    <td>
+                                        <t t-esc="o.cnic" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Application No</th>
+                                    <td>
+                                        <t t-esc="o.id" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Date</th>
+                                    <td>
+                                        <t t-esc="time.strftime('%Y-%m-%d')" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Due Date</th>
+                                    <td>
+                                        <t t-esc="time.strftime('%Y-%m-%d')" />
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Fee Details Table -->
+                            <table class="amount-table">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Amount (PKR)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Admission Processing Fee</td>
+                                        <td class="amount-cell">
+                                            <span t-esc="config.get_param('odoo19_academy.admission_fee', '0.0')" />
+                                        </td>
+                                    </tr>
+                                    <tr class="total-row">
+                                        <td>
+                                            <strong>Total Amount</strong>
+                                        </td>
+                                        <td class="amount-cell">
+                                            <strong>
+                                                <span t-esc="config.get_param('odoo19_academy.admission_fee', '0.0')" />
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Footer Notes -->
+                            <div style="margin-top: 40px; padding: 20px; border-top: 2px dashed #dee2e6;">
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6c757d;">
+                                    <div style="flex: 1;">
+                                        <strong>Payment Instructions:</strong>
+                                        <br />
+                                        <p>In case of any fee related issue please contact
+                                            Admission Office.<br /> Note: This is computer
+                                            generated document and need no signature.</p>
+                                    </div>
+                                </div>
+                            </div>
+    </div>
+</div>
+                          
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

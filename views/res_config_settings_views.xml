@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.academy</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="10"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Academy" string="Academy" name="odoo19_academy">
+                    <block title="Admission Fees" name="admission_fees_block">
+                        <setting string="Registration Fees" help="Configure local and international admission fees.">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="admission_fee" class="col-lg-3 o_light_label"/>
+                                    <field name="admission_fee"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="international_admission_fee" class="col-lg-3 o_light_label"/>
+                                    <field name="international_admission_fee"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+
+                    <block title="Bank Accounts" name="bank_accounts_block">
+                        <setting string="Bank Details" help="Configure up to 3 bank accounts for fee collection.">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="bank_account_title_1" class="col-lg-3 o_light_label" string="Account 1"/>
+                                    <field name="bank_account_title_1"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="bank_account_title_2" class="col-lg-3 o_light_label" string="Account 2"/>
+                                    <field name="bank_account_title_2"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="bank_account_title_3" class="col-lg-3 o_light_label" string="Account 3"/>
+                                    <field name="bank_account_title_3"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

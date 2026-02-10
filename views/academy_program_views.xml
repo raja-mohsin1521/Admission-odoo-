@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_academy_program_form" model="ir.ui.view">
+        <field name="name">academy.program.form</field>
+        <field name="model">academy.program</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. BS Computer Science"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="dept_id"/>
+                            <field name="career_id"/>
+                        </group>
+                        <group>
+                            <field name="duration"/>
+                            <field name="campus_id"/>
+                            <field name="effective_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Eligibility Criteria" name="eligibility">
+                            <field name="eligibility_ids">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="degree_id"/>
+                                    <field name="evaluation_type"/>
+                                    <field name="eligibility_percentage_min" string="Min %"/>
+                                    <field name="eligibility_cgpa_min" string="Min CGPA"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_academy_eligibility_form" model="ir.ui.view">
+        <field name="name">academy.program.eligibility.form</field>
+        <field name="model">academy.program.eligibility</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Engineering Entry Requirements"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="career_id"/>
+                        </group>
+                        <group>
+                            <field name="degree_id"/>
+                            <field name="specialization_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <group string="Scoring Logic">
+                        <group>
+                            <field name="evaluation_type" widget="radio"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Percentage Range" invisible="evaluation_type != 'percentage'">
+                            <field name="eligibility_percentage_min"/>
+                            <field name="eligibility_percentage_max"/>
+                        </group>
+                        <group string="CGPA Range" invisible="evaluation_type != 'cgpa'">
+                            <field name="eligibility_cgpa_min"/>
+                            <field name="eligibility_cgpa_max"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Programs Using This Criteria" name="programs">
+                            <field name="program_ids" readonly="1">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="dept_id"/>
+                                    <field name="campus_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_academy_program" model="ir.actions.act_window">
+        <field name="name">Programs</field>
+        <field name="res_model">academy.program</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_academy_eligibility" model="ir.actions.act_window">
+        <field name="name">Eligibility Criteria</field>
+        <field name="res_model">academy.program.eligibility</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_student_application_form" model="ir.ui.view">
+        <field name="name">student.application.form</field>
+        <field name="model">student.application</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    
+                    <button name="action_voucher_uploaded" string="Upload Voucher" type="object" class="oe_highlight" invisible="state != 'submit'"/>
+                    
+                    <button name="action_verify_voucher" string="Verify Voucher" type="object" class="oe_highlight" invisible="state != 'voucher_uploaded' or voucher_state == 'verified'"/>
+                    
+                    <button name="action_reject_voucher" string="Reject Voucher" type="object" invisible="state != 'voucher_uploaded' or voucher_state == 'verified'"/>
+
+                    <button name="action_approve" string="Approve Application" type="object" class="oe_highlight" invisible="state != 'voucher_uploaded' or voucher_state != 'verified'"/>
+                    
+                    <button name="action_done" string="Done" type="object" class="oe_highlight" invisible="state != 'approve'"/>
+                    
+                    <button name="action_draft" string="Reset to Draft" type="object" invisible="state not in ['submit', 'cancel']"/>
+                    
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state not in ['draft', 'submit', 'voucher_uploaded']"/>
+                    
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submit,voucher_uploaded,approve,done"/>
+                </header>
+                <sheet>
+                    <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}"/>
+                    <div class="oe_title">
+                        <label for="name" string="Application Number"/>
+                        <h1><field name="name" placeholder="New"/></h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Applicant Info">
+                            <field name="applicant_id" options="{'no_create': True}"/>
+                            <field name="cnic" force_save="1" readonly="1"/>
+                            <field name="register_id" options="{'no_create': True}"/>
+                            <field name="academic_session_id" options="{'no_create': True}" />
+                            <field name="academic_term_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Contact Details">
+                            <field name="email" readonly="1"/>
+                            <field name="phone"/>
+                            <field name="test_score"/>
+                            <field name="aggregate_score"/>
+
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Education Details" name="education_details">
+                            <field name="education_line_ids">
+                                <list editable="bottom">
+                                    <field name="academic_level_id" options="{'no_create': True}"/>
+                                    <field name="academic_degree_id" options="{'no_create': True}" domain="[('level_id', '=', academic_level_id)]"/>
+                                    <field name="specialization_id" options="{'no_create': True}" domain="[('degree_id', '=', academic_degree_id)]"/>
+                                    <field name="total_marks"/>
+                                    <field name="obtained_marks"/>
+                                    <field name="percentage" readonly="1" force_save="1"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Program Preferences" name="preferences">
+                            <field name="preference_line_ids">
+                                <list editable="bottom">
+                                    <field name="preference_no"/>
+                                    <field name="program_id" options="{'no_create': True}"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Fee Voucher" name="fee_voucher">
+                            <group>
+                                <group string="Voucher Info">
+                                    <field name="voucher_number"/>
+                                    <field name="voucher_amount"/>
+                                    <field name="voucher_state" widget="badge" decoration-info="voucher_state == 'uploaded'" decoration-success="voucher_state == 'verified'" decoration-danger="voucher_state == 'rejected'"/>
+                                </group>
+                                <group string="Dates">
+                                    <field name="voucher_issue_date"/>
+                                    <field name="fee_submit_date"/>
+                                    <field name="voucher_verified_date"/>
+                                </group>
+                            </group>
+                            <group string="Voucher Attachment">
+                                <field name="voucher_image" widget="image" options="{'size': [300, 300]}"/>
+                            </group>
+                        </page>
+
+                        <page string="Test Details" name="test_details">
+                            <group>
+                                <group string="Center Selection">
+                                    <field name="test_type_id" options="{'no_create': True}"/>
+                                    <field name="test_center_id" options="{'no_create': True}"/>
+                                </group>
+                                <group string="Slot Selection">
+                                    <field name="test_slot_id" 
+                                           options="{'no_create': True}" 
+                                           context="{'show_date': 1}"
+                                           domain="[('center_id', '=', test_center_id), ('active', '=', True)]"/>
+                                    <field name="confirm_test_slot" widget="boolean_toggle"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Family Details" name="family_details">
+                            <group>
+                                <group string="Father Info">
+                                    <field name="father_name"/>
+                                    <field name="father_cnic"/>
+                                    <field name="father_status"/>
+                                </group>
+                                <group string="Mother Info">
+                                    <field name="mother_name"/>
+                                    <field name="mother_cnic"/>
+                                    <field name="mother_status"/>
+                                    <field name="mother_cell"/>
+                                    <field name="mother_education"/>
+                                    <field name="mother_profession"/>
+                                </group>
+                            </group>
+                            <group string="Guardian Info">
+                                <group>
+                                    <field name="guardian_name"/>
+                                    <field name="guardian_relation"/>
+                                    <field name="guardian_cnic"/>
+                                </group>
+                                <group>
+                                    <field name="guardian_cell"/>
+                                    <field name="guardian_income"/>
+                                    <field name="guardian_address"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Personal Details" name="personal_details">
+                            <group>
+                                <group string="Demographics">
+                                    <field name="dob"/>
+                                    <field name="gender"/>
+                                    <field name="religion"/>
+                                    <field name="blood_group"/>
+                                </group>
+                                <group string="Identification">
+                                    <field name="nationality_id" options="{'no_create': True}"/>
+                                    <field name="passport"/>
+                                    <field name="province"/>
+                                    <field name="domicile"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="present_address" placeholder="Present Address"/>
+                                <field name="how_did_you_know"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_student_application_list" model="ir.ui.view">
+        <field name="name">student.application.list</field>
+        <field name="model">student.application</field>
+        <field name="arch" type="xml">
+            <list string="Student Applications">
+                <field name="name"/>
+                <field name="applicant_id"/>
+                <field name="register_id"/>
+                <field name="academic_session_id"/>
+                <field name="voucher_state" widget="badge" decoration-info="voucher_state == 'uploaded'" decoration-success="voucher_state == 'verified'"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'submit'" decoration-primary="state == 'voucher_uploaded'" decoration-success="state in ('approve', 'done')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_student_application" model="ir.actions.act_window">
+        <field name="name">Student Applications</field>
+        <field name="res_model">student.application</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first student application!
+            </p>
+        </field>
+    </record>
+</odoo>

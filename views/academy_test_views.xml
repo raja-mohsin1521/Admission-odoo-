@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_academy_test_type_list" model="ir.ui.view">
+        <field name="name">academy.test.type.list</field>
+        <field name="model">academy.test.type</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_academy_test_center_form" model="ir.ui.view">
+        <field name="name">academy.test.center.form</field>
+        <field name="model">academy.test.center</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="City/Center Name"/>
+                        <h1><field name="name" placeholder="e.g. NUTECH Islamabad"/></h1>
+                    </div>
+                    <group>
+                        <group string="Basic Information">
+                            <field name="code"/>
+                            <field name="session_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="register_id" options="{'no_create': True, 'no_open': True}"/>
+                        </group>
+                        <group string="Configuration">
+                            <field name="test_type_id" options="{'no_create': True}"/>
+                            <field name="count" readonly="1"/>
+                            <field name="address"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Test Timing" name="test_timing">
+                            <field name="timing_ids">
+                                <list editable="bottom">
+                                    <field name="test_date"/>
+                                    <field name="test_time" widget="float_time"/>
+                                    <field name="career_id" options="{'no_create': True}"/>
+                                    <field name="degree_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                    <field name="capacity"/>
+                                    <field name="count" readonly="1"/>
+                                    <field name="active" widget="boolean_toggle"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_academy_test_center_list" model="ir.ui.view">
+        <field name="name">academy.test.center.list</field>
+        <field name="model">academy.test.center</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="test_type_id"/>
+                <field name="session_id"/>
+                <field name="count" string="Total Registered"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_academy_test_center" model="ir.actions.act_window">
+        <field name="name">Test Centers</field>
+        <field name="res_model">academy.test.center</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_academy_test_type" model="ir.actions.act_window">
+        <field name="name">Test Types</field>
+        <field name="res_model">academy.test.type</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

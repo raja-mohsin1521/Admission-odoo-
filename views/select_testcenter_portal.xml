@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="select_testcenter_portal" name="Select Test Center Modal">
+        <div class="modal fade" t-att-id="'testCenterModal_%s' % application.id" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                    <div class="modal-header text-white border-0 py-3" style="background: #e67e22; border-radius: 15px 15px 0 0;">
+                        <h5 class="modal-title fw-bold">
+                            <i class="fa fa-calendar-check-o me-2"/>Entrance Test Scheduling
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form action="/my/application/test_slot/confirm" method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="application_id" t-att-value="application.id"/>
+                        
+                        <div class="modal-body p-4 bg-light">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark">Test Center</label>
+                                <select name="test_center_id" 
+                                        class="form-select border-warning-subtle shadow-sm" 
+                                        required="1"
+                                        t-att-onchange="'filterTestSlots(this, %s)' % application.id">
+                                    <option value="">-- Select Center --</option>
+                                    <t t-foreach="request.env['academy.test.center'].sudo().search([])" t-as="center">
+                                        <option t-att-value="center.id"><t t-esc="center.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label fw-bold text-dark">Available Slots</label>
+                                <select name="test_slot_id" 
+                                        t-att-id="'slot_select_%s' % application.id" 
+                                        class="form-select border-warning-subtle shadow-sm" 
+                                        required="1">
+                                    <option value="" class="default-option">-- Select Center First --</option>
+                                    <t t-foreach="request.env['academy.test.timing'].sudo().search([('active','=',True)])" t-as="slot">
+                                        <t t-if="slot.test_date &gt;= datetime.date.today()">
+                                            <option t-att-value="slot.id" 
+                                                    t-att-data-center="slot.center_id.id" 
+                                                    class="d-none slot-option">
+                                                <t t-esc="slot.display_name"/>
+                                            </option>
+                                        </t>
+                                    </t>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-0 bg-light py-3">
+                            <button type="submit" class="btn btn-warning w-100 fw-bold text-white shadow rounded-pill">
+                                <i class="fa fa-check-circle me-2"/>Confirm Slot &amp; Approve Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            function filterTestSlots(selectElement, appId) {
+                var centerId = selectElement.value;
+                var slotSelect = document.getElementById('slot_select_' + appId);
+                var options = slotSelect.getElementsByClassName('slot-option');
+                var defaultOpt = slotSelect.querySelector('.default-option');
+
+                // Reset current selection
+                slotSelect.value = "";
+
+                if (centerId) {
+                    defaultOpt.text = "-- Select Time Slot --";
+                    for (var i = 0; i &lt; options.length; i++) {
+                        if (options[i].getAttribute('data-center') === centerId) {
+                            options[i].classList.remove('d-none');
+                        } else {
+                            options[i].classList.add('d-none');
+                        }
+                    }
+                } else {
+                    defaultOpt.text = "-- Select Center First --";
+                    for (var i = 0; i &lt; options.length; i++) {
+                        options[i].classList.add('d-none');
+                    }
+                }
+            }
+        </script>
+    </template>
+</odoo>

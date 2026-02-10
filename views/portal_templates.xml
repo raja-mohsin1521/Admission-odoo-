@@ -1,0 +1,787 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_applications" name="My Applications">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Student Applications</t>
+            </t>
+            <div class="container my-4">
+    <div class="card shadow-lg border-0 rounded-4 p-4">
+        <h4 class="text-center fw-bold mb-4 text-primary">Instructions</h4>
+
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item border-0 py-2">✅ Select <strong>Admission Form</strong></li>
+                    <li class="list-group-item border-0 py-2">✍️ Fill out the <strong>form carefully</strong></li>
+                    <li class="list-group-item border-0 py-2">⬇️ Download the <strong>fee voucher</strong></li>
+                    <li class="list-group-item border-0 py-2">📤 Upload <strong>paid fee voucher</strong></li>
+                </ul>
+            </div>
+
+            <div class="col-md-6">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item border-0 py-2">🔄 Check portal <strong>daily</strong></li>
+                    <li class="list-group-item border-0 py-2">✔️ Wait for <strong>verification approval</strong></li>
+                    <li class="list-group-item border-0 py-2">📍 Select your <strong>test center</strong></li>
+                    <li class="list-group-item border-0 py-2">🎟️ Download <strong>admit card</strong></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <div class="container mt-3">
+               <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+
+    <!-- Header + Button -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0 fw-bold text-dark">My Applications</h5>
+
+        <a href="/my/applications/new"
+           class="btn btn-primary rounded-pill px-4 d-flex align-items-center gap-2 shadow-sm">
+            <i class="fa fa-plus"></i>
+            New Application
+        </a>
+    </div>
+
+    <!-- Empty State -->
+    <t t-if="not applications">
+        <div class="text-center py-5 bg-light rounded-4 border">
+            <i class="fa fa-file-text-o fa-2x text-secondary mb-3"></i>
+            <p class="mb-1 fw-semibold">No applications yet</p>
+            <small class="text-muted">
+                Click <strong>New Application</strong> to submit your first application.
+            </small>
+        </div>
+    </t>
+
+</div>
+
+               <div class="container my-4">
+    <div class="row g-3">
+
+        <t t-foreach="applications" t-as="app">
+            <div class="col-lg-4 col-md-6 col-12">
+                <div class="card shadow-sm border-0 rounded-4 h-100">
+
+                    <div class="card-body d-flex flex-column justify-content-between">
+
+                        <!-- Application Info -->
+                        <a t-attf-href="/my/application/#{app.id}" class="text-decoration-none text-dark mb-3">
+                            <h6 class="fw-bold mb-1">Application #<t t-esc="app.id"/></h6>
+                            <small class="text-muted">Session: <t t-esc="app.register_id.name"/></small>
+                        </a>
+
+                        <!-- Status + Actions (Parallel) -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                            <!-- Status Badge -->
+                            <div class="me-2">
+                                <span
+                                    t-attf-class="badge rounded-pill px-3 py-2
+                                    #{'bg-success' if app.state in ['submit','approve','done']
+                                    else 'bg-warning text-dark' if app.state == 'voucher_uploaded'
+                                    else 'bg-secondary'} text-capitalize">
+                                    <t t-esc="app.state"/>
+                                </span>
+
+                                <t t-if="app.voucher_state == 'rejected'">
+                                    <span class="badge rounded-pill bg-danger ms-2">Voucher Rejected</span>
+                                </t>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex flex-wrap gap-2">
+
+                                <!-- Download / Upload -->
+                                <t t-if="app.state == 'submit' or app.voucher_state in ['rejected']">
+                                    <a t-attf-href="/my/application/download_voucher/#{app.id}"
+                                       class="btn btn-outline-primary btn-sm rounded-pill shadow-sm"
+                                       target="_blank">
+                                        <i class="fa fa-download me-1"></i> Voucher
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn btn-primary btn-sm rounded-pill shadow-sm"
+                                            data-bs-toggle="modal"
+                                            t-att-data-bs-target="'#feePayModal_%s' % app.id">
+                                        <i class="fa fa-upload me-1"></i>
+                                        <t t-if="app.voucher_state == 'rejected'">Re-upload Slip</t>
+                                        <t t-else="">Upload Paid Slip</t>
+                                    </button>
+
+                                    <t t-call="odoo19_academy.fee_voucher_upload_modal">
+                                        <t t-set="application" t-value="app"/>
+                                    </t>
+                                </t>
+
+                                <!-- Select Test Slot -->
+                                <t t-if="app.state == 'voucher_uploaded' and app.voucher_state == 'verified'">
+                                    <button type="button"
+                                            class="btn btn-warning btn-sm rounded-pill shadow-sm fw-bold"
+                                            data-bs-toggle="modal"
+                                            t-att-data-bs-target="'#testCenterModal_%s' % app.id">
+                                        <i class="fa fa-map-marker me-1"></i> Test Slot
+                                    </button>
+
+                                    <t t-call="odoo19_academy.select_testcenter_portal">
+                                        <t t-set="application" t-value="app"/>
+                                    </t>
+                                </t>
+
+                                <!-- Download Admit Card -->
+                                <t t-if="app.state == 'approve' and app.confirm_test_slot">
+                                    <a t-attf-href="/report/pdf/odoo19_academy.report_admit_card_template/#{app.id}"
+                                       class="btn btn-success btn-sm rounded-pill shadow-sm fw-bold"
+                                       target="_blank">
+                                        <i class="fa fa-id-card-o me-1"></i> Admit Card
+                                    </a>
+                                </t>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </t>
+
+    </div>
+</div>
+
+                <div t-if="pager" class="o_portal_pager text-center mt-3">
+                    <t t-call="portal.pager" />
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="select_admission_register" name="Select Admission Session">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4">
+                <h3>Select an Admission Session</h3>
+                <div class="row mt-4">
+                    <t t-foreach="registers" t-as="reg">
+                        <div class="col-md-4">
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <t t-esc="reg.name" />
+                                    </h5>
+                                    <p class="card-text text-muted"> Term: <t
+                                            t-esc="reg.academic_term_id.name" />
+                                    </p>
+                                    <form action="/admission/register/select" method="post">
+                                        <input type="hidden" name="csrf_token"
+                                            t-att-value="request.csrf_token()" />
+                                        <input type="hidden" name="register_id" t-att-value="reg.id" />
+                                        <button type="submit" class="btn btn-primary w-100">Apply
+                                            Now</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_my_application_detail" name="Admission Form">
+        <t t-call="portal.portal_layout">
+            <div class="container mb64 mt-4">
+                <div class="progress mb-4" style="height: 30px;">
+                    <div
+                        t-attf-class="progress-bar #{'bg-success' if current_step > 1 else 'bg-primary'}"
+                        role="progressbar" style="width: 20%">Personal</div>
+                    <div
+                        t-attf-class="progress-bar #{'bg-success' if current_step > 2 else 'bg-secondary'} #{'bg-primary' if current_step == 2 else ''}"
+                        role="progressbar" style="width: 20%">Demographics</div>
+                    <div
+                        t-attf-class="progress-bar #{'bg-success' if current_step > 3 else 'bg-secondary'} #{'bg-primary' if current_step == 3 else ''}"
+                        role="progressbar" style="width: 20%">Education</div>
+                    <div
+                        t-attf-class="progress-bar #{'bg-success' if current_step > 4 else 'bg-secondary'} #{'bg-primary' if current_step == 4 else ''}"
+                        role="progressbar" style="width: 20%">Preferences</div>
+                    <div
+                        t-attf-class="progress-bar bg-secondary #{'bg-primary' if current_step == 5 else ''}"
+                        role="progressbar" style="width: 20%">Finalize</div>
+                </div>
+
+                <form action="/my/application/save" method="post" id="admission_form"
+                    enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                    <input type="hidden" name="application_id" t-att-value="application.id" />
+
+                    <div class="card mb-4 shadow-sm border-primary">
+                        <div
+                            class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h5>1. Personal &amp; Family Information</h5>
+                            <button type="submit" name="submit_stage" value="personal"
+                                class="btn btn-light btn-sm fw-bold text-primary"
+                                t-if="application.state == 'draft'">
+                                <i class="fa fa-save me-1" />Save &amp; Next </button>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="text-muted mb-3 border-bottom pb-2">Student Details</h6>
+                            <div class="row mb-4">
+                                <div class="col-md-3 mb-3 text-center">
+                                    <label class="fw-bold text-secondary d-block">Student Image</label>
+                                    <div
+                                        class="border rounded bg-light d-flex align-items-center justify-content-center"
+                                        style="height: 160px; overflow: hidden;">
+                                        <t t-if="application.image_1920">
+                                            <img t-att-src="image_data_uri(application.image_1920)"
+                                                class="img-fluid" style="max-height: 100%;" />
+                                        </t>
+                                        <t t-else="">
+                                            <i class="fa fa-user fa-5x text-muted"></i>
+                                        </t>
+                                    </div>
+                                    <div class="mt-2" t-if="application.state == 'draft'">
+                                        <input type="file" name="image_1920"
+                                            class="form-control form-control-sm" accept="image/*" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label class="fw-bold text-secondary">Student Name</label>
+                                            <div
+                                                class="form-control-plaintext border p-2 rounded bg-light">
+                                                <t t-esc="application.applicant_id.name" />
+                                                <t t-esc="application.applicant_id.last_name" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="fw-bold text-secondary">Student CNIC</label>
+                                            <div
+                                                class="form-control-plaintext border p-2 rounded bg-light">
+                                                <t t-esc="application.cnic" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="fw-bold text-secondary">Email</label>
+                                            <div
+                                                class="form-control-plaintext border p-2 rounded bg-light">
+                                                <t t-esc="application.email" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="fw-bold text-secondary">Phone</label>
+                                            <div
+                                                class="form-control-plaintext border p-2 rounded bg-light">
+                                                <t t-esc="application.phone" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="fw-bold text-secondary">Admission Register</label>
+                                            <div
+                                                class="form-control-plaintext border p-2 rounded bg-light">
+                                                <t t-esc="application.register_id.name" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="fw-bold text-secondary">Application No</label>
+                                            <div
+                                                class="form-control-plaintext border p-2 rounded bg-light">
+                                                <t t-esc="application.id" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h6 class="text-muted mb-3 border-bottom pb-2">Family Information</h6>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Father Name *</label>
+                                    <input type="text" name="father_name" class="form-control"
+                                        t-att-value="application.father_name" required="required"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Father CNIC *</label>
+                                    <input type="text" name="father_cnic" class="form-control"
+                                        t-att-value="application.father_cnic" required="required"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Father Status</label>
+                                    <select name="father_status" class="form-select"
+                                        t-att-disabled="application.state != 'draft'">
+                                        <option value="alive"
+                                            t-att-selected="application.father_status == 'alive'">
+                                            Alive</option>
+                                        <option value="deceased"
+                                            t-att-selected="application.father_status == 'deceased'">
+                                            Deceased</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Mother Name</label>
+                                    <input type="text" name="mother_name" class="form-control"
+                                        t-att-value="application.mother_name"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Mother CNIC</label>
+                                    <input type="text" name="mother_cnic" class="form-control"
+                                        t-att-value="application.mother_cnic"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Mother Status</label>
+                                    <select name="mother_status" class="form-select"
+                                        t-att-disabled="application.state != 'draft'">
+                                        <option value="alive"
+                                            t-att-selected="application.mother_status == 'alive'">
+                                            Alive</option>
+                                        <option value="deceased"
+                                            t-att-selected="application.mother_status == 'deceased'">
+                                            Deceased</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Guardian Name *</label>
+                                    <input type="text" name="guardian_name" class="form-control"
+                                        t-att-value="application.guardian_name" required="required"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Guardian Relation</label>
+                                    <input type="text" name="guardian_relation" class="form-control"
+                                        t-att-value="application.guardian_relation"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Guardian CNIC</label>
+                                    <input type="text" name="guardian_cnic" class="form-control"
+                                        t-att-value="application.guardian_cnic"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold">Guardian Income</label>
+                                    <input type="number" step="any" name="guardian_income"
+                                        class="form-control"
+                                        t-att-value="application.guardian_income"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold">Address</label>
+                                    <input type="text" name="guardian_address" class="form-control"
+                                        t-att-value="application.guardian_address"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        t-attf-class="card mb-4 shadow-sm border-info #{'opacity-50 pe-none' if current_step &lt; 2 else ''}">
+                        <div
+                            class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                            <h5>2. Demographics</h5>
+                            <button type="submit" name="submit_stage" value="demographics"
+                                class="btn btn-light btn-sm fw-bold text-info"
+                                t-if="current_step &gt;= 2 and application.state == 'draft'">
+                                <i class="fa fa-save me-1" />Save &amp; Next </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Date of Birth *</label>
+                                    <input type="date" name="dob" class="form-control"
+                                        t-att-value="application.dob"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Gender *</label>
+                                    <select name="gender" class="form-select"
+                                        t-att-disabled="application.state != 'draft'">
+                                        <option value="">-- Select --</option>
+                                        <option value="male"
+                                            t-att-selected="application.gender == 'male'">Male</option>
+                                        <option value="female"
+                                            t-att-selected="application.gender == 'female'">Female</option>
+                                        <option value="other"
+                                            t-att-selected="application.gender == 'other'">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Religion</label>
+                                    <input type="text" name="religion" class="form-control"
+                                        t-att-value="application.religion"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Nationality</label>
+                                    <select name="nationality_id" class="form-select"
+                                        t-att-disabled="application.state != 'draft'">
+                                        <option value="">-- Select --</option>
+                                        <t t-foreach="countries" t-as="c">
+                                            <option t-att-value="c.id"
+                                                t-att-selected="application.nationality_id and c.id == application.nationality_id.id">
+                                                <t t-esc="c.name" />
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Province *</label>
+                                    <input type="text" name="province" class="form-control"
+                                        t-att-value="application.province"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold">Domicile</label>
+                                    <input type="text" name="domicile" class="form-control"
+                                        t-att-value="application.domicile"
+                                        t-att-disabled="application.state != 'draft'" />
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="fw-bold">Present Address</label>
+                                    <textarea name="present_address" class="form-control" rows="2"
+                                        t-att-disabled="application.state != 'draft'">
+                                        <t t-esc="application.present_address or ''" />
+                                    </textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div
+                            t-attf-class="card mb-4 shadow-sm border-secondary #{'opacity-50 pe-none' if current_step &lt; 3 else ''}">
+                            <div
+                                class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                                <h5>3. Educational Details</h5>
+                                <button type="submit" name="submit_stage" value="education"
+                                    class="btn btn-light btn-sm fw-bold text-secondary"
+                                    t-if="current_step &gt;= 3 and application.state == 'draft'">
+                                    <i class="fa fa-save me-1" />Save &amp; Next </button>
+                            </div>
+
+                            <div class="card-body">
+                                <table class="table table-sm border" id="edu_table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 20%;">Level</th>
+                                            <th style="width: 25%;">Degree</th>
+                                            <th style="width: 25%;">Specialization</th>
+                                            <th>Total</th>
+                                            <th>Obtained</th>
+                                            <th>%</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="edu_lines"
+                                            t-value="application.education_line_ids or [False]" />
+                                        <t t-foreach="edu_lines" t-as="edu">
+                                            <tr class="edu_row">
+                                                <td>
+                                                    <select
+                                                        t-attf-name="education[#{edu_index}][level_id]"
+                                                        class="form-select form-select-sm level-select"
+                                                       
+                                                        t-att-disabled="application.state != 'draft'">
+                                                        <option value="">-- Level --</option>
+                                                        <t
+                                                            t-foreach="request.env['academy.level'].sudo().search([])"
+                                                            t-as="l">
+                                                            <option t-att-value="l.id"
+                                                                t-att-selected="edu and edu.academic_level_id.id == l.id">
+                                                                <t t-esc="l.name" />
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </td>
+
+                                                <td>
+                                                    <select
+                                                        t-attf-name="education[#{edu_index}][degree_id]"
+                                                        class="form-select form-select-sm degree-select"
+                                                        
+                                                        t-att-disabled="application.state != 'draft'">
+                                                        <option value="">-- Degree --</option>
+                                                        <t
+                                                            t-foreach="request.env['academy.degree'].sudo().search([])"
+                                                            t-as="d">
+                                                            <option t-att-value="d.id"
+                                                                t-att-data-level="d.level_id.id"
+                                                                t-att-selected="edu and edu.academic_degree_id.id == d.id">
+                                                                <t t-esc="d.name" />
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </td>
+
+                                                <td>
+                                                    <select
+                                                        t-attf-name="education[#{edu_index}][specialization_id]"
+                                                        class="form-select form-select-sm spec-select"
+                                                        t-att-disabled="application.state != 'draft'">
+                                                        <option value="">-- Specialization --</option>
+                                                        <t
+                                                            t-foreach="request.env['academy.specialization'].sudo().search([])"
+                                                            t-as="s">
+                                                            <option t-att-value="s.id"
+                                                                t-att-data-degree="s.degree_id.id"
+                                                                t-att-selected="edu and edu.specialization_id.id == s.id">
+                                                                <t t-esc="s.name" />
+                                                            </option>
+                                                        </t>
+                                                    </select>
+                                                </td>
+
+                                                <td>
+                                                    <input type="number" step="any"
+                                                        t-attf-name="education[#{edu_index}][total_marks]"
+                                                        class="form-control form-control-sm marks-total"
+                                                        t-att-value="edu.total_marks if edu else 0"
+                                                        t-att-disabled="application.state != 'draft'" />
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="any"
+                                                        t-attf-name="education[#{edu_index}][obtained_marks]"
+                                                        class="form-control form-control-sm marks-obtained"
+                                                        t-att-value="edu.obtained_marks if edu else 0"
+                                                        t-att-disabled="application.state != 'draft'" />
+                                                </td>
+
+                                                <td class="align-middle fw-bold text-center">
+                                                    <span class="row-perc">
+                                                        <t
+                                                            t-esc="'%.2f' % (edu.percentage if edu else 0.0)" />
+                                                    </span>
+                                                    %
+                                </td>
+
+                                                <td class="text-center align-middle">
+                                                    <a href="#" class="text-danger remove-edu"
+                                                        t-if="application.state == 'draft'">
+                                                        <i class="fa fa-trash-o" />
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                    id="add_edu_row" t-if="application.state == 'draft'">
+                                    <i class="fa fa-plus me-1" />Add Qualification </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        t-attf-class="card mb-4 shadow-sm border-success #{'opacity-50 pe-none' if current_step &lt; 4 else ''}">
+                        <div
+                            class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                            <h5>4. Program Preferences</h5>
+                            <button type="submit" name="submit_stage" value="preferences"
+                                class="btn btn-light btn-sm fw-bold text-success"
+                                t-if="current_step &gt;= 4 and application.state == 'draft'">
+                                <i class="fa fa-save me-1" />Save &amp; Verify </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <t t-foreach="range(1, 4)" t-as="i">
+                                    <t t-set="p"
+                                        t-value="application.preference_line_ids.filtered(lambda x: x.preference_no == i)" />
+
+                                    <div class="col-md-4 mb-2">
+                                        <label class="fw-bold">Preference <t t-esc="i" /></label>
+                                        <select t-attf-name="pref_#{i}"
+                                            class="form-select program-preference-select"
+                                            t-att-disabled="application.state != 'draft'">
+                                            <option value="">-- Choose Program --</option>
+                                            <t t-foreach="eligible_programs" t-as="prog">
+                                                <option t-att-value="prog.id"
+                                                    t-att-selected="p and p[0].program_id.id == prog.id">
+                                                    <t t-esc="prog.name" />
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        t-attf-class="d-flex justify-content-end mb-5 #{'opacity-50 pe-none' if current_step &lt; 5 else ''}">
+                        <button type="submit" name="submit_stage" value="final"
+                            class="btn btn-primary btn-lg px-5"
+                            t-if="application.state == 'draft'"> Submit Final Application
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <script type="text/javascript">
+                /* <![CDATA[ */
+    (function() {
+        function waitForJQuery() {
+            if (window.jQuery) {
+                var $ = window.jQuery;
+                $(document).ready(function () {
+                    
+                    $(document).on('change', "input[name='image_1920']", function (e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function (event) {
+                                $(".text-center .border.rounded.bg-light").html($("<img>", {
+                                    src: event.target.result,
+                                    class: 'img-fluid',
+                                    style: 'max-height: 100%;'
+                                }));
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+
+                    function applyFilters($row) {
+                        var levelId = $row.find('.level-select').val();
+                        var degreeId = $row.find('.degree-select').val();
+
+                        $row.find('.degree-select option').each(function() {
+                            var optLevel = $(this).data('level');
+                            if (!optLevel || optLevel == levelId || $(this).val() === "") {
+                                $(this).show().prop('disabled', false);
+                            } else {
+                                $(this).hide().prop('disabled', true);
+                            }
+                        });
+
+                        $row.find('.spec-select option').each(function() {
+                            var optDegree = $(this).data('degree');
+                            if (!optDegree || optDegree == degreeId || $(this).val() === "") {
+                                $(this).show().prop('disabled', false);
+                            } else {
+                                $(this).hide().prop('disabled', true);
+                            }
+                        });
+                    }
+
+                    $(document).on('change', '.level-select', function () {
+                        var $row = $(this).closest('tr');
+                        $row.find('.degree-select').val('');
+                        $row.find('.spec-select').val('');
+                        applyFilters($row);
+                    });
+
+                    $(document).on('change', '.degree-select', function () {
+                        var $row = $(this).closest('tr');
+                        $row.find('.spec-select').val('');
+                        applyFilters($row);
+                    });
+
+                    $(document).on('click', '#add_edu_row', function(e) {
+                        e.preventDefault();
+                        var $tbody = $('#edu_table tbody');
+                        var $firstRow = $tbody.find('.edu_row').first();
+                        
+                        if ($firstRow.length === 0) return;
+
+                        var $newRow = $firstRow.clone();
+                        var index = $tbody.find('.edu_row').length;
+
+                        $newRow.find('input').val('').attr('value', '');
+                        $newRow.find('.row-perc').text('0.00');
+                        
+                        $newRow.find('select').each(function() {
+                            $(this).val('');
+                            $(this).find('option').show().prop('disabled', false);
+                        });
+
+                        $newRow.find('select, input').each(function() {
+                            var name = $(this).attr('name');
+                            if (name) {
+                                var newName = name.replace(/\[\d+\]/, '[' + index + ']');
+                                $(this).attr('name', newName);
+                            }
+                        });
+
+                        $tbody.append($newRow);
+                    });
+
+                    $(document).on('click', '.remove-edu', function(e) {
+                        e.preventDefault();
+                        if ($('.edu_row').length > 1) {
+                            $(this).closest('tr').remove();
+                        } else {
+                            var $lastRow = $(this).closest('tr');
+                            $lastRow.find('input').val('');
+                            $lastRow.find('select').val('');
+                            applyFilters($lastRow);
+                        }
+                    });
+
+                    $(document).on('input', '.marks-total, .marks-obtained', function() {
+                        var $tr = $(this).closest('tr');
+                        var total = parseFloat($tr.find('.marks-total').val()) || 0;
+                        var obtained = parseFloat($tr.find('.marks-obtained').val()) || 0;
+                        var perc = (total > 0 && obtained <= total) ? ((obtained / total) * 100).toFixed(2) : '0.00';
+                        $tr.find('.row-perc').text(perc);
+                    });
+
+                    function updatePreferences() {
+                        var $selects = $('.program-preference-select');
+                        var selectedValues = [];
+
+                        $selects.each(function() {
+                            var val = $(this).val();
+                            if (val) {
+                                selectedValues.push(val);
+                            }
+                        });
+
+                        $selects.each(function() {
+                            var $currentSelect = $(this);
+                            var currentVal = $currentSelect.val();
+
+                            $currentSelect.find('option').each(function() {
+                                var $opt = $(this);
+                                var optVal = $opt.val();
+
+                                if (!optVal) return;
+
+                                if (selectedValues.includes(optVal) && optVal !== currentVal) {
+                                    $opt.prop('disabled', true).css('color', '#ccc');
+                                } else {
+                                    $opt.prop('disabled', false).css('color', '');
+                                }
+                            });
+                        });
+                    }
+
+                    $(document).on('change', '.program-preference-select', function() {
+                        updatePreferences();
+                    });
+
+                    $('.edu_row').each(function() {
+                        applyFilters($(this));
+                    });
+
+                    updatePreferences();
+                });
+            } else {
+                setTimeout(waitForJQuery, 50);
+            }
+        }
+        waitForJQuery();
+    })();
+/* ]]> */
+            </script>
+        </t>
+    </template>
+</odoo>

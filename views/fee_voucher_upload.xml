@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="fee_voucher_upload_modal" name="Fee Voucher Upload Modal">
+        <div class="modal fade" t-att-id="'feePayModal_%s' % application.id" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
+                    
+                    <div class="modal-header text-white border-0" style="background: #003366; border-radius: 12px 12px 0 0;">
+                        <h5 class="modal-title fw-bold">
+                            <i class="fa fa-money-bill-wave me-2"/>Submit Fee Verification
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form action="/my/application/voucher/upload" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="application_id" t-att-value="application.id"/>
+                        
+                        <div class="modal-body p-4 bg-light">
+                            <div class="row g-4">
+                                <div class="col-md-7">
+                                    <div class="bg-white p-4 rounded shadow-sm h-100">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-dark">Fee Amount <span class="text-danger">*</span></label>
+                                            <input type="text" name="voucher_amount" class="form-control" 
+                                                   placeholder="Fee amount in PKR" required="1"/>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-dark">Voucher / Ref Number <span class="text-danger">*</span></label>
+                                            <input type="text" name="voucher_number" class="form-control" 
+                                                   placeholder="e.g. 12345678" required="1"/>
+                                        </div>
+
+                                        <div class="mb-0">
+                                            <label class="form-label fw-bold text-dark">Deposit Date <span class="text-danger">*</span></label>
+                                            <input type="date" name="fee_submit_date" class="form-control" 
+                                                   t-att-value="datetime.date.today()" required="1"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-5 text-center">
+                                    <div class="bg-white p-4 rounded shadow-sm h-100 d-flex flex-column justify-content-center border-2 border-dashed border-primary">
+                                        <label class="form-label fw-bold text-dark mb-3">Upload Paid Slip <span class="text-danger">*</span></label>
+                                        
+                                        <div class="upload-preview-container mb-3" t-att-onclick="'document.getElementById(\'file_input_%s\').click();' % application.id" style="cursor: pointer;">
+                                            <img t-att-id="'preview_img_%s' % application.id" src="/web/static/img/placeholder.png" 
+                                                 class="img-fluid rounded d-none shadow-sm" style="max-height: 150px;"/>
+                                            
+                                            <div t-att-id="'upload_ui_%s' % application.id" class="py-4">
+                                                <i class="fa fa-cloud-upload text-primary mb-2" style="font-size: 40px;"/>
+                                                <p class="small text-muted mb-0 fw-bold">Click to select image</p>
+                                            </div>
+                                        </div>
+
+                                        <input type="file" t-att-id="'file_input_%s' % application.id" name="voucher_image" 
+                                               class="d-none" accept="image/*" required="1" 
+                                               t-att-onchange="'previewImage(this, %s);' % application.id"/>
+                                        
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" t-att-onclick="'document.getElementById(\'file_input_%s\').click();' % application.id">
+                                            Choose File
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-0 bg-light py-3">
+                            <button type="button" class="btn btn-link text-muted" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary px-5 fw-bold shadow">
+                                <i class="fa fa-check-circle me-1"/> Submit Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            function previewImage(input, appId) {
+                if (input.files &amp;&amp; input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var preview = document.getElementById('preview_img_' + appId);
+                        var ui = document.getElementById('upload_ui_' + appId);
+                        preview.src = e.target.result;
+                        preview.classList.remove('d-none');
+                        ui.classList.add('d-none');
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>
+    </template>
+</odoo>

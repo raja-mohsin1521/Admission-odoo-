@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_admit_card" model="ir.actions.report">
+        <field name="name">Admit Card</field>
+        <field name="model">student.application</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">odoo19_academy.report_admit_card_template</field>
+        <field name="report_file">odoo19_academy.report_admit_card_template</field>
+        <field name="print_report_name">'Admit_Card_%s' % object.id</field>
+        <field name="binding_model_id" ref="model_student_application"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_admit_card_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: Arial, sans-serif;">
+                        
+                        <div class="text-center border-bottom pb-2 mb-4">
+                            <h2 class="fw-bold">ENTRANCE TEST ADMIT CARD</h2>
+                            <h4 class="text-muted">
+                                <span t-field="o.academic_session_id.name"/> - <span t-field="o.academic_term_id.name"/>
+                            </h4>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-8">
+                                <table class="table table-sm table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 35%;"><strong>Roll Number:</strong></td>
+                                            <td><span t-field="o.id" style="font-size: 1.4em; font-weight: bold;"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Applicant Name:</strong></td>
+                                            <td>
+                                                <span t-field="o.applicant_id.name"/> <span t-field="o.applicant_id.last_name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Father Name:</strong></td>
+                                            <td><span t-field="o.father_name"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>CNIC:</strong></td>
+                                            <td><span t-field="o.cnic"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Program Preference:</strong></td>
+                                            <td>
+                                                <t t-set="first_pref" t-value="o.preference_line_ids.filtered(lambda p: p.preference_no == 1)"/>
+                                                <span t-if="first_pref" t-field="first_pref[0].program_id.name"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="col-4 text-center">
+                                <div style="width: 160px; height: 190px; border: 2px solid #000; margin: 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; background-color: #f8f9fa;">
+                                    <t t-if="o.image_1920">
+                                        <img t-att-src="image_data_uri(o.image_1920)" style="max-height: 100%; max-width: 100%; object-fit: cover;"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="text-muted fw-bold">PASTE PHOTO<br/>HERE</span>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h5 class="border-bottom pb-2 mb-3 fw-bold">Test Details</h5>
+                            <table class="table table-bordered border-dark">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="text-center" style="width: 25%;">Test Date</th>
+                                        <th class="text-center" style="width: 25%;">Reporting Time</th>
+                                        <th class="text-center" style="width: 50%;">Test Center</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center align-middle">
+                                            <h5 class="m-0 fw-bold"><span t-field="o.test_slot_id.test_date"/></h5>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <h5 class="m-0 fw-bold">
+                                                <span t-esc="'%02d:%02d' % (int(o.test_slot_id.test_time), int(round((o.test_slot_id.test_time % 1) * 60)))"/>
+                                            </h5>
+                                        </td>
+                                        <td class="align-middle">
+                                            <strong style="font-size: 1.1em;" t-field="o.test_center_id.name"/><br/>
+                                            <span t-if="o.test_center_id.address" t-field="o.test_center_id.address" class="text-muted" style="font-size: 0.9em;"/>
+                                            <span t-else="" class="text-muted fst-italic">Address not available</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-5">
+                            <h5 class="text-decoration-underline fw-bold">IMPORTANT INSTRUCTIONS</h5>
+                            <ul style="font-size: 0.95rem; line-height: 1.6;">
+                                <li>Please bring this <strong>Admit Card</strong> along with your original <strong>CNIC/B-Form</strong>.</li>
+                                <li>Candidates must reach the center at least <strong>30 minutes</strong> before the reporting time.</li>
+                                <li>Mobile phones, calculators, smartwatches, and other electronic devices are <strong>strictly prohibited</strong>.</li>
+                                <li>Use of unfair means will lead to immediate disqualification.</li>
+                                <li>Please bring your own clipboard and blue/black ballpoint pen.</li>
+                            </ul>
+                        </div>
+
+                        <div class="row mt-5 pt-5">
+                            <div class="col-6">
+                                <div class="border-top border-dark w-75 pt-2 text-center fw-bold">
+                                    Candidate Signature
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border-top border-dark w-75 pt-2 text-center ms-auto fw-bold">
+                                    Controller of Examinations
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-5 text-muted" style="font-size: 0.8em;">
+                            <p>This is a system-generated document. Errors and omissions are expected.</p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

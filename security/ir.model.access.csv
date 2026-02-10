@@ -1,0 +1,50 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_academy_course_emp,academy.course employee,model_academy_course,base.group_user,1,1,1,1
+access_student_applicant_emp,student.applicant employee,model_student_applicant,base.group_user,1,1,1,1
+access_academy_career_emp,academy.career employee,model_academy_career,base.group_user,1,1,1,1
+access_academic_session_emp,academic.session employee,model_academy_academic_session,base.group_user,1,1,1,1
+access_term_scheme_emp,term.scheme employee,model_academy_term_scheme,base.group_user,1,1,1,1
+access_academy_campus_emp,academy.campus employee,model_academy_campus,base.group_user,1,1,1,1
+access_academy_institute_emp,academy.institute employee,model_academy_institute,base.group_user,1,1,1,1
+access_academy_department_emp,academy.department employee,model_academy_department,base.group_user,1,1,1,1
+access_academy_level_emp,academy.level employee,model_academy_level,base.group_user,1,1,1,1
+access_academy_degree_emp,academy.degree employee,model_academy_degree,base.group_user,1,1,1,1
+access_academy_specialization_emp,academy.specialization employee,model_academy_specialization,base.group_user,1,1,1,1
+access_academy_program_emp,academy.program employee,model_academy_program,base.group_user,1,1,1,1
+access_academy_program_eligibility_emp,academy.eligibility employee,model_academy_program_eligibility,base.group_user,1,1,1,1
+access_admission_register_emp,admission.register employee,model_admission_register,base.group_user,1,1,1,1
+access_academy_aggregate_emp,academy.aggregate employee,model_academy_aggregate,base.group_user,1,1,1,1
+access_academy_aggregate_line_emp,academy.aggregate.line employee,model_academy_aggregate_line,base.group_user,1,1,1,1
+access_student_application_emp,student.application employee,model_student_application,base.group_user,1,1,1,1
+access_student_education_emp,student.education employee,model_student_application_education,base.group_user,1,1,1,1
+access_student_preference_emp,student.preference employee,model_student_application_preference,base.group_user,1,1,1,1
+access_academy_test_type_emp,academy.test.type employee,model_academy_test_type,base.group_user,1,1,1,1
+access_academy_test_center_emp,academy.test.center employee,model_academy_test_center,base.group_user,1,1,1,1
+access_academy_test_timing_emp,academy.test.timing employee,model_academy_test_timing,base.group_user,1,1,1,1
+access_admission_test_score_emp,admission.test.score employee,model_admission_test_score,base.group_user,1,1,1,1
+access_academy_course_portal,academy.course portal,model_academy_course,base.group_portal,1,0,0,0
+access_student_applicant_portal,student.applicant portal,model_student_applicant,base.group_portal,1,1,0,0
+access_academy_career_portal,academy.career portal,model_academy_career,base.group_portal,1,0,0,0
+access_academic_session_portal,academic.session portal,model_academy_academic_session,base.group_portal,1,0,0,0
+access_term_scheme_portal,term.scheme portal,model_academy_term_scheme,base.group_portal,1,0,0,0
+access_academy_campus_portal,academy.campus portal,model_academy_campus,base.group_portal,1,0,0,0
+access_academy_institute_portal,academy.institute portal,model_academy_institute,base.group_portal,1,0,0,0
+access_academy_department_portal,academy.department portal,model_academy_department,base.group_portal,1,0,0,0
+access_academy_level_portal,academy.level portal,model_academy_level,base.group_portal,1,0,0,0
+access_academy_degree_portal,academy.degree portal,model_academy_degree,base.group_portal,1,0,0,0
+access_academy_specialization_portal,academy.specialization portal,model_academy_specialization,base.group_portal,1,0,0,0
+access_academy_program_portal,academy.program portal,model_academy_program,base.group_portal,1,0,0,0
+access_academy_program_eligibility_portal,academy.eligibility portal,model_academy_program_eligibility,base.group_portal,1,0,0,0
+access_admission_register_portal,admission.register portal,model_admission_register,base.group_portal,1,0,0,0
+access_academy_aggregate_portal,academy.aggregate portal,model_academy_aggregate,base.group_portal,1,0,0,0
+access_student_application_portal,student.application portal,model_student_application,base.group_portal,1,1,1,0
+access_student_education_portal,student.education portal,model_student_application_education,base.group_portal,1,1,1,0
+access_student_preference_portal,student.preference portal,model_student_application_preference,base.group_portal,1,1,1,0
+access_academy_test_type_portal,academy.test.type portal,model_academy_test_type,base.group_portal,1,0,0,0
+access_academy_test_center_portal,academy.test.center portal,model_academy_test_center,base.group_portal,1,0,0,0
+access_academy_test_timing_portal,academy.test.timing portal,model_academy_test_timing,base.group_portal,1,0,0,0
+access_admission_test_score_portal,admission.test.score portal,model_admission_test_score,base.group_portal,1,0,0,0
+access_academy_seat_allocation,academy.seat.allocation,model_academy_seat_allocation,base.group_user,1,1,1,1
+access_academy_seat_allocation_line,academy.seat.allocation.line,model_academy_seat_allocation_line,base.group_user,1,1,1,1
+access_merit_selection_register,merit.selection.register,model_merit_selection_register,base.group_user,1,1,1,1
+access_merit_selection_line,merit.selection.line,model_merit_selection_line,base.group_user,1,1,1,1

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_academy_aggregate_form" model="ir.ui.view">
+        <field name="name">academy.aggregate.form</field>
+        <field name="model">academy.aggregate</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Merit Calculation 2026"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="total_weight" widget="progressbar"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Calculation Lines" name="lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="source_type"/>
+                                    <field name="academic_level_id" 
+                                           invisible="source_type != 'academics'" 
+                                           required="source_type == 'academics'"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="display_weight" string="Weight (%)"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_academy_aggregate_list" model="ir.ui.view">
+        <field name="name">academy.aggregate.list</field>
+        <field name="model">academy.aggregate</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="total_weight" string="Total %"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_academy_aggregate" model="ir.actions.act_window">
+        <field name="name">Aggregate Calculations</field>
+        <field name="res_model">academy.aggregate</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    
+</odoo>

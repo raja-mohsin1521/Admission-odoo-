@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_student_applicant_form" model="ir.ui.view">
+        <field name="name">student.applicant.form</field>
+        <field name="model">student.applicant</field>
+        <field name="arch" type="xml">
+            <form string="Student Registration">
+                <header>
+                    <button name="action_student_signup" 
+                            string="SIGN UP" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="state == 'registered'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,registered"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Candidate Name"/>
+                        <h1>
+                            <field name="name" placeholder="First Name" style="width: 45%"/>
+                            <field name="last_name" placeholder="Last Name" style="width: 45%; margin-left: 10px;"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="applying_for_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="email" widget="email"/>
+                            <field name="phone" widget="phone"/>
+                        </group>
+                        <group>
+                            <field name="cnic" placeholder="13 digits only"/>
+                            <field name="applicant_type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="user_id" readonly="1" invisible="not user_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_student_applicant_list" model="ir.ui.view">
+        <field name="name">student.applicant.list</field>
+        <field name="model">student.applicant</field>
+        <field name="arch" type="xml">
+            <list string="Students">
+                <field name="name"/>
+                <field name="last_name"/>
+                <field name="email"/>
+                <field name="applying_for_id"/>
+                <field name="cnic"/>
+                <field name="state" widget="badge" decoration-success="state == 'registered'" decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_student_applicant" model="ir.actions.act_window">
+        <field name="name">Students</field>
+        <field name="res_model">student.applicant</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

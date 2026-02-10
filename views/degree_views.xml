@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_academic_level_list" model="ir.ui.view">
+        <field name="name">academy.level.list</field>
+        <field name="model">academy.level</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_academic_degree_form" model="ir.ui.view">
+        <field name="name">academy.degree.form</field>
+        <field name="model">academy.degree</field>
+        <field name="arch" type="xml">
+            <form string="Academic Degree">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="year_of_education"/>
+                            <field name="level_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Specializations">
+                            <field name="specialization_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Programs" name="programs_offering">
+                            <field name="offering_ids" readonly="1">
+                                <list>
+                                    <field name="name" string="Criteria Name"/>
+                                    <field name="specialization_ids" widget="many2many_tags"/>
+                                    <field name="evaluation_type"/>
+                                    <field name="eligibility_percentage_min" string="Min %"/>
+                                    <field name="eligibility_cgpa_min" string="Min CGPA"/>
+                                    <field name="program_ids" widget="many2many_tags" string="Used in Programs"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_academy_degree_level" model="ir.actions.act_window">
+        <field name="name">Degree Levels</field>
+        <field name="res_model">academy.level</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_academy_degree" model="ir.actions.act_window">
+        <field name="name">Degrees</field>
+        <field name="res_model">academy.degree</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_academy_specialization" model="ir.actions.act_window">
+        <field name="name">Specializations</field>
+        <field name="res_model">academy.specialization</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

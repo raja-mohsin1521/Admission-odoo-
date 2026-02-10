@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="signup_custom_fields" inherit_id="auth_signup.fields" name="Custom Signup Fields">
+        <xpath expr="//div[hasclass('mb-3')][last()]" position="after">
+            
+            <div class="mb-3 field-phone">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="text" name="phone" t-att-value="phone" id="phone" class="form-control" placeholder="e.g. +92 300 1234567" required="required"/>
+            </div>
+
+            <div class="mb-3 field-cnic">
+                <label for="cnic" class="form-label">CNIC</label>
+                <input type="text" name="cnic" t-att-value="cnic" id="cnic" class="form-control" placeholder="13 Digits (No Dashes)" required="required"/>
+            </div>
+
+        </xpath>
+    </template>
+</odoo>
