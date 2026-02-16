@@ -1,0 +1,81 @@
+.o_academy_dashboard {
+    background-color: #f0f2f5;
+    height: 100%;
+    overflow-y: auto !important;
+    display: block;
+    position: relative;
+    padding-bottom: 50px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.o_academy_dashboard .container-fluid {
+    height: auto;
+    min-height: 100%;
+    display: block;
+    max-width: 100%;
+}
+
+.o_academy_dashboard h3 {
+    color: #111827;
+    font-weight: 700;
+    border-left: 6px solid #714B67;
+    padding-left: 1rem;
+}
+
+.o_academy_dashboard h4 {
+    color: #4b5563;
+    font-weight: 600;
+}
+
+.o_academy_dashboard .card {
+    border: none;
+    border-radius: 12px;
+    background: #ffffff;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.o_academy_dashboard .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+    cursor: pointer;
+}
+
+.o_academy_dashboard .card-body strong {
+    font-size: 2rem;
+    color: #111827;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.o_academy_dashboard .card-body span {
+    font-size: 0.85rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+}
+
+.o_academy_dashboard .bg-white {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+.o_academy_dashboard canvas {
+    max-width: 100% !important;
+}
+
+.o_academy_dashboard .voucher-status-section {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 2rem;
+    margin-top: 1rem;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.o_academy_dashboard .card {
+    animation: fadeIn 0.4s ease-out forwards;
+}

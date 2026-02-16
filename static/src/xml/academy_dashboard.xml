@@ -1,0 +1,65 @@
+<templates xml:space="preserve">
+    <t t-name="odoo19_academy.academy_dashboard_template">
+        <div class="o_academy_dashboard">
+            <div class="container-fluid px-4">
+                
+                <div class="row align-items-center mb-4 pt-4">
+                    <div class="col-12">
+                        <h3 class="m-0 text-dark fw-bold border-start border-primary border-5 ps-3">
+                            Admission Dashboard
+                        </h3>
+                    </div>
+                </div>
+                
+                <div class="row g-4 mb-5">
+                    <t t-foreach="state.app" t-as="c" t-key="c.key">
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+                            <div class="card h-100 shadow-sm border-0 cursor-pointer" 
+                                 t-on-click="() => this.openFilter('state', c.key)">
+                                <div class="card-body p-4">
+                                    <span class="text-uppercase text-muted fw-semibold small mb-2 d-block" t-esc="c.title"/>
+                                    <strong class="h2 mb-0 fw-bold text-dark" t-esc="c.value"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+
+                <div class="voucher-status-section">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h4 class="text-secondary fw-semibold">Voucher Status</h4>
+                        </div>
+                    </div>
+                    <div class="row g-4 mb-5">
+                        <t t-foreach="state.voucher" t-as="v" t-key="v.key">
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+                                <div class="card h-100 shadow-sm border-0 cursor-pointer" 
+                                     t-on-click="() => this.openFilter('voucher_state', v.key)">
+                                    <div class="card-body p-4">
+                                        <span class="text-uppercase text-muted fw-semibold small mb-2 d-block" t-esc="v.title"/>
+                                        <strong class="h2 mb-0 fw-bold text-dark" t-esc="v.value"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <div class="row g-4 pb-5">
+                    <div class="col-12 col-xl-6">
+                        <div class="bg-white p-4 rounded-4 shadow-sm border">
+                            <canvas t-ref="appChart" height="350"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-12 col-xl-6">
+                        <div class="bg-white p-4 rounded-4 shadow-sm border">
+                            <canvas t-ref="voucherChart" height="350"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </t>
+</templates>

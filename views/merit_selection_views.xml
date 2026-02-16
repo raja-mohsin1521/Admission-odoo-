@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- SEARCH VIEW (Odoo 19 SAFE) -->
     <record id="view_merit_selection_register_search" model="ir.ui.view">
         <field name="name">merit.selection.register.search</field>
         <field name="model">merit.selection.register</field>
         <field name="arch" type="xml">
             <search>
-
                 <field name="name"/>
                 <field name="academic_session_id"/>
                 <field name="academic_term_id"/>
@@ -26,13 +24,11 @@
                 <filter name="group_state"
                         string="Group by Status"
                         context="{'group_by':'state'}"/>
-
             </search>
         </field>
     </record>
 
 
-    <!-- LIST VIEW -->
     <record id="view_merit_selection_register_list" model="ir.ui.view">
         <field name="name">merit.selection.register.list</field>
         <field name="model">merit.selection.register</field>
@@ -40,16 +36,18 @@
             <list string="Master Merit Lists">
                 <field name="name"/>
                 <field name="academic_session_id"/>
+                <field name="academic_term_id"/>
+                <field name="merit_round"/>
                 <field name="state"
                        widget="badge"
                        decoration-info="state == 'draft'"
-                       decoration-success="state in ('allotted','second_list','finalized')"/>
+                       decoration-warning="state == 'running'"
+                       decoration-success="state == 'done'"/>
             </list>
         </field>
     </record>
 
 
-    <!-- FORM VIEW -->
     <record id="view_merit_selection_register_form" model="ir.ui.view">
         <field name="name">merit.selection.register.form</field>
         <field name="model">merit.selection.register</field>
@@ -57,67 +55,75 @@
             <form string="Master Merit Selection">
 
                 <header>
-                    <button name="action_generate_merit_list"
-                            string="Calculate Rankings"
+                    <button name="action_generate_merit"
+                            string="Generate Merit Ranking"
                             type="object"
                             class="btn-primary"
                             invisible="state != 'draft'"/>
 
-                    <button name="action_allot_seats"
-                            string="Generate 1st Merit List"
+                    <button name="action_next_merit"
+                            string="Generate Next Merit List"
                             type="object"
                             class="btn-success"
-                            invisible="state != 'calculated'"/>
+                            invisible="state != 'running'"/>
 
-                    <button name="action_generate_second_list"
-                            string="Generate 2nd Merit List"
+                    <button name="action_close_admission"
+                            string="Close Admission"
                             type="object"
-                            class="btn-warning"
-                            invisible="state not in ('allotted','second_list')"
-                            confirm="This will fill empty seats with the next available students. Have you unchecked the absentees?"/>
+                            class="btn-danger"
+                            invisible="state != 'running'"/>
 
                     <field name="state"
                            widget="statusbar"
-                           statusbar_visible="draft,calculated,allotted,second_list,finalized"/>
+                           statusbar_visible="draft,running,done"/>
                 </header>
 
                 <sheet>
                     <div class="oe_title">
                         <h1>
-                            <field name="name" placeholder="Title"/>
+                            <field name="name" placeholder="Merit List Title"/>
                         </h1>
                     </div>
 
                     <group>
                         <group>
-                            <field name="academic_session_id" readonly="state != 'draft'"/>
-                            <field name="academic_term_id" readonly="state != 'draft'"/>
+                            <field name="academic_session_id"
+                                   readonly="state != 'draft'"/>
+                            <field name="academic_term_id"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="merit_round" readonly="1"/>
                         </group>
                     </group>
 
                     <notebook>
                         <page string="Merit Rankings">
-                            <field name="line_ids">
-                                <list editable="bottom" create="0" delete="0">
-                                    <field name="rank" readonly="1"/>
-                                    <field name="applicant_id" readonly="1"/>
-                                    <field name="aggregate_score" readonly="1"/>
-                                    <field name="allotted_program_id" readonly="1"/>
-                                    <field name="is_allocated" string="Seat Confirmed"/>
+                            <field name="line_ids" readonly="state == 'done'">
+                                <list create="0" delete="0">
+                                    <field name="rank"/>
+                                    <field name="applicant_id"/>
+                                    <field name="aggregate_score"/>
+                                    <field name="allotted_program_id"/>
+                                    <field name="is_allocated"
+                                           readonly="merit_round != 0"/>
+                                    <button name="action_withdraw"
+                                            type="object"
+                                            string="Withdraw"
+                                            class="btn-danger"
+                                            invisible="merit_round == 0"/>
+                                    <field name="merit_round"/>
                                 </list>
                             </field>
                         </page>
                     </notebook>
                 </sheet>
 
-               
-
             </form>
         </field>
     </record>
 
 
-    <!-- ACTION -->
     <record id="action_merit_selection_register" model="ir.actions.act_window">
         <field name="name">Master Merit List</field>
         <field name="res_model">merit.selection.register</field>
@@ -126,3 +132,4 @@
     </record>
 
 </odoo>
+ 

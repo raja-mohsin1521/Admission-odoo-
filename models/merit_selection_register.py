@@ -1,122 +1,178 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
+
 class MeritSelectionRegister(models.Model):
     _name = 'merit.selection.register'
-    _description = 'Master Merit Selection'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string="Merit List Title", required=True)
-    academic_session_id = fields.Many2one('academy.academic.session', string="Session", required=True)
-    academic_term_id = fields.Many2one('academy.term.scheme', string="Term", required=True)
+    name = fields.Char(required=True)
+    academic_session_id = fields.Many2one('academy.academic.session', required=True)
+    academic_term_id = fields.Many2one('academy.term.scheme', required=True)
+
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('calculated', 'Merit Calculated'),
-        ('allotted', '1st List Published'),
-        ('second_list', '2nd List Published'),
-        ('finalized', 'Finalized')
-    ], default='draft', tracking=True)
+        ('running', 'Running'),
+        ('done', 'Closed')
+    ], default='draft')
 
-    line_ids = fields.One2many('merit.selection.line', 'register_id', string="Merit Rankings")
+    merit_round = fields.Integer(default=0)
 
-    _unique_merit_list = models.Constraint(
-        'UNIQUE(academic_session_id, academic_term_id)',
-        'A merit list already exists for this Session and Term!'
+    line_ids = fields.One2many(
+        'merit.selection.line',
+        'register_id'
     )
 
-    def action_generate_merit_list(self):
+    excluded_applicant_ids = fields.Many2many(
+        'student.applicant'
+    )
+
+    _sql_constraints = [
+        ('unique_merit',
+         'UNIQUE(academic_session_id, academic_term_id)',
+         'Merit already exists for this Session and Term!')
+    ]
+
+    def action_generate_merit(self):
+        self.ensure_one()
+
+        if self.state != 'draft':
+            raise UserError(_("Already started."))
+
         self.line_ids.unlink()
+        self.excluded_applicant_ids = [(5, 0, 0)]
+        self.merit_round = 0
+
         applications = self.env['student.application'].search([
             ('academic_session_id', '=', self.academic_session_id.id),
             ('academic_term_id', '=', self.academic_term_id.id),
-            ('register_id.state', '=', 'merit'),
             ('state', '=', 'approve')
         ])
 
         if not applications:
-            raise UserError(_("No approved applications found in 'Merit' stage."))
+            raise UserError(_("No approved applications found."))
 
-        student_best_apps = {}
+        best = {}
         for app in applications:
             sid = app.applicant_id.id
-            if sid not in student_best_apps or app.aggregate_score > student_best_apps[sid].aggregate_score:
-                student_best_apps[sid] = app
+            if sid not in best or app.aggregate_score > best[sid].aggregate_score:
+                best[sid] = app
 
-        sorted_apps = sorted(student_best_apps.values(), key=lambda x: x.aggregate_score, reverse=True)
+        sorted_apps = sorted(best.values(), key=lambda x: x.aggregate_score, reverse=True)
+
         lines = []
-        for index, app in enumerate(sorted_apps, start=1):
+        for rank, app in enumerate(sorted_apps, start=1):
             lines.append((0, 0, {
-                'rank': index,
+                'rank': rank,
                 'applicant_id': app.applicant_id.id,
                 'application_id': app.id,
                 'aggregate_score': app.aggregate_score,
+                'merit_round': 0,
                 'is_allocated': False
             }))
+
         self.line_ids = lines
-        self.state = 'calculated'
+        self.state = 'running'
 
-    def action_allot_seats(self):
-        self._process_allocation()
-        self.state = 'allotted'
+        self.action_next_merit()
 
-    def action_generate_second_list(self):
-        self._process_allocation()
-        self.state = 'second_list'
+    def action_next_merit(self):
+        self.ensure_one()
 
-    def _process_allocation(self):
-        allocation_master = self.env['academy.seat.allocation'].search([
+        if self.state != 'running':
+            raise UserError(_("Not running."))
+
+        if self._all_seats_filled():
+            raise UserError(_("All seats filled. Close admission."))
+
+        self.merit_round += 1
+        self._allocate_round()
+
+    def action_close_admission(self):
+        if not self._all_seats_filled():
+            raise UserError(_("Seats still available."))
+        self.state = 'done'
+
+    def _get_allocation(self):
+        alloc = self.env['academy.seat.allocation'].search([
             ('academic_session_id', '=', self.academic_session_id.id),
             ('academic_term_id', '=', self.academic_term_id.id),
             ('state', '=', 'confirmed')
         ], limit=1)
 
-        if not allocation_master:
-            raise UserError(_("No confirmed Seat Allocation found."))
+        if not alloc:
+            raise UserError(_("No confirmed seat allocation."))
+
+        return alloc
+
+    def _all_seats_filled(self):
+        alloc = self._get_allocation()
+        for l in alloc.line_ids:
+            if l.occupied_seats < l.total_seats:
+                return False
+        return True
+
+    def _allocate_round(self):
+        alloc = self._get_allocation()
+
+        for l in alloc.line_ids:
+            l.occupied_seats = 0
 
         capacities = {}
-        for l in allocation_master.line_ids:
-            currently_occupied = len(self.line_ids.filtered(
-                lambda x: x.is_allocated and x.allotted_program_id.id == l.program_id.id
-            ))
+        for l in alloc.line_ids:
             capacities[l.program_id.id] = {
                 'total': l.total_seats,
-                'occupied': currently_occupied,
+                'occupied': 0,
                 'line': l
             }
 
-        for line in self.line_ids.filtered(lambda x: not x.is_allocated).sorted('rank'):
+        for line in self.line_ids.sorted('rank'):
+
+            if line.merit_round:
+                pid = line.allotted_program_id.id
+                if pid in capacities:
+                    capacities[pid]['occupied'] += 1
+                    capacities[pid]['line'].occupied_seats = capacities[pid]['occupied']
+                continue
+
+            if line.applicant_id.id in self.excluded_applicant_ids.ids:
+                continue
+
             preferences = line.application_id.preference_line_ids.sorted('preference_no')
-            
-            allotted_program = False
+
             for pref in preferences:
-                p_id = pref.program_id.id
-                if p_id in capacities and capacities[p_id]['occupied'] < capacities[p_id]['total']:
-                    allotted_program = pref.program_id
-                    capacities[p_id]['occupied'] += 1
-                    
-                    alloc_line = capacities[p_id]['line']
-                    alloc_line.occupied_seats = capacities[p_id]['occupied']
-                    alloc_line.closing_merit = line.aggregate_score
-                    if alloc_line.occupied_seats == 1:
-                         alloc_line.opening_merit = line.aggregate_score
-                    
+                pid = pref.program_id.id
+
+                if pid in capacities and capacities[pid]['occupied'] < capacities[pid]['total']:
+
+                    capacities[pid]['occupied'] += 1
+                    cap_line = capacities[pid]['line']
+                    cap_line.occupied_seats = capacities[pid]['occupied']
+
+                    line.write({
+                        'allotted_program_id': pid,
+                        'is_allocated': True,
+                        'merit_round': self.merit_round
+                    })
                     break
-            
-            if allotted_program:
-                line.write({
-                    'allotted_program_id': allotted_program.id,
-                    'is_allocated': True
-                })
+
 
 class MeritSelectionLine(models.Model):
     _name = 'merit.selection.line'
-    _description = 'Merit Ranking Line'
     _order = 'rank asc'
 
     register_id = fields.Many2one('merit.selection.register', ondelete='cascade')
-    rank = fields.Integer(string="Rank", readonly=True)
-    applicant_id = fields.Many2one('student.applicant', string="Student", readonly=True)
-    application_id = fields.Many2one('student.application', string="Source App", readonly=True)
-    aggregate_score = fields.Float(string="Aggregate", digits=(16, 2), readonly=True)
-    allotted_program_id = fields.Many2one('academy.program', string="Allotted Program", readonly=True)
-    is_allocated = fields.Boolean(string="Confirmed", default=False)
+    rank = fields.Integer(readonly=True)
+    applicant_id = fields.Many2one('student.applicant', readonly=True)
+    application_id = fields.Many2one('student.application', readonly=True)
+    aggregate_score = fields.Float(readonly=True)
+
+    allotted_program_id = fields.Many2one('academy.program', readonly=True)
+    is_allocated = fields.Boolean()
+    merit_round = fields.Integer(readonly=True)
+
+    def action_withdraw(self):
+        for rec in self:
+            register = rec.register_id
+            register.excluded_applicant_ids = [(4, rec.applicant_id.id)]
+            rec.unlink()

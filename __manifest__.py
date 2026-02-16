@@ -7,20 +7,27 @@
     "website": "https://sqride.com/",
     "license": "LGPL-3",
     "depends": [
-        "base", 
-        "web", 
-        "mail",          # REQUIRED: For mail.thread and mail.activity.mixin
-        "portal", 
+        "base",
+        "web",
+        "mail",
+        "portal",
         "auth_signup",
         "website"
     ],
+    "application": True,
+    "installable": True,
+'assets': {
+    'web.assets_backend': [
+        'odoo19_academy/static/src/css/academy_dashboard.css',
+        'odoo19_academy/static/src/xml/academy_dashboard.xml',
+        'odoo19_academy/static/src/js/academy_dashboard.js',
+    ],
+},
+
     "data": [
-        # 1. Security First
         "security/security.xml",
         "security/ir.model.access.csv",
-        'data/ir_sequence_data.xml',
-
-        # 2. Base Configuration Views (Actions must be defined here first)
+        "data/ir_sequence_data.xml",
         "views/campus_views.xml",
         "views/career_views.xml",
         "views/degree_views.xml",
@@ -31,25 +38,18 @@
         "views/admission_register_views.xml",
         "views/academy_test_views.xml",
         "views/test_score_views.xml",
-        
         "views/res_config_settings_views.xml",
-        # 3. Application & Student Views
         "views/aggregate_calculation_views.xml",
         "views/student_views.xml",
         "views/student_application_views.xml",
-'views/fee_voucher_upload.xml',
-'views/select_testcenter_portal.xml',
-'views/academy_seat_allocation_views.xml',
-'views/merit_selection_views.xml',
-        # 4. MENUS (Must be loaded AFTER the actions/views they reference)
-        "views/academy_menu.xml", 
-
-        # 5. Templates & Portals
+        "views/fee_voucher_upload.xml",
+        "views/select_testcenter_portal.xml",
+        "views/academy_seat_allocation_views.xml",
+        "views/merit_selection_views.xml",
+        "views/academy_menu.xml",
         "views/portal_templates.xml",
         "views/signup_templates.xml",
         "report/admission_challan_report.xml",
         "report/admit_card_report.xml",
     ],
-    "installable": True,
-    "application": True,
 }

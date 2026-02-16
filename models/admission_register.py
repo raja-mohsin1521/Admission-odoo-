@@ -9,7 +9,7 @@ class AdmissionRegister(models.Model):
     name = fields.Char(string="Register Name", required=True)
     start_date = fields.Date(string="Start Date", default=fields.Date.context_today, required=True)
     end_date = fields.Date(string="End Date", required=True)
-    
+    line_ids = fields.One2many('merit.selection.line', 'register_id', string='Lines')
     dob_min = fields.Date(string="DOB Minimum")
     dob_max = fields.Date(string="DOB Maximum")
     min_education_year = fields.Integer(string="Minimum Education Year", default=12)

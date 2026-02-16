@@ -8,171 +8,187 @@
             <field name="target">new</field>
             <field name="context">{'module': 'odoo19_academy'}</field>
         </record>
+        <!-- Dashboard Action -->
+        <odoo>
+    <record id="action_academy_dashboard" model="ir.actions.client">
+        <field name="name">Dashboard</field>
+        <field name="tag">academy_dashboard_tag</field>
+    </record>
 
-        <menuitem id="academy_root_menu" name="Admission" sequence="10"/>
+    <menuitem id="academy_root_menu" name="Academy" sequence="10"/>
+
+    <menuitem id="academy_menu_dashboard"
+              name="Dashboard"
+              parent="academy_root_menu"
+              action="action_academy_dashboard"
+              sequence="1" />
+</odoo>
+
+
+        <menuitem id="academy_root_menu" name="Admission" sequence="10" />
 
         <menuitem id="academy_menu_admission_register_root"
-                  name="Admission Register"
-                  parent="academy_root_menu"
-                  sequence="10"/>
+            name="Admission Register"
+            parent="academy_root_menu"
+            sequence="10" />
 
         <menuitem id="academy_menu_admission_register"
-                  name="Registers"
-                  parent="academy_menu_admission_register_root"
-                  action="action_admission_register"
-                  sequence="1"/>
+            name="Registers"
+            parent="academy_menu_admission_register_root"
+            action="action_admission_register"
+            sequence="1" />
 
         <menuitem id="academy_menu_students_root"
-                  name="Applicants"
-                  parent="academy_root_menu"
-                  sequence="30"/>
+            name="Applicants"
+            parent="academy_root_menu"
+            sequence="30" />
 
         <menuitem id="academy_menu_applicant_list"
-                  name="Registration Profiles"
-                  parent="academy_menu_students_root"
-                  action="action_student_applicant"
-                  sequence="10"/>
+            name="Registration Profiles"
+            parent="academy_menu_students_root"
+            action="action_student_applicant"
+            sequence="10" />
 
         <menuitem id="academy_menu_student_applications"
-                  name="Applications"
-                  parent="academy_menu_students_root"
-                  action="action_student_application"
-                  sequence="20"/>
+            name="Applications"
+            parent="academy_menu_students_root"
+            action="action_student_application"
+            sequence="20" />
 
-        <menuitem id="menu_test_management_root" 
-                  name="Test Management" 
-                  parent="academy_root_menu" 
-                  sequence="40"/>
+        <menuitem id="menu_test_management_root"
+            name="Test Management"
+            parent="academy_root_menu"
+            sequence="40" />
 
-        <menuitem id="menu_test_center" 
-                  name="Test Centers" 
-                  parent="menu_test_management_root" 
-                  action="action_academy_test_center" 
-                  sequence="10"/>
+        <menuitem id="menu_test_center"
+            name="Test Centers"
+            parent="menu_test_management_root"
+            action="action_academy_test_center"
+            sequence="10" />
 
-        <menuitem id="menu_test_type" 
-                  name="Test Types" 
-                  parent="menu_test_management_root" 
-                  action="action_academy_test_type" 
-                  sequence="20"/>
+        <menuitem id="menu_test_type"
+            name="Test Types"
+            parent="menu_test_management_root"
+            action="action_academy_test_type"
+            sequence="20" />
 
-        <menuitem id="menu_admission_test_score" 
-                  name="Test Scores" 
-                  parent="menu_test_management_root" 
-                  action="action_admission_test_score" 
-                  sequence="30"/>
+        <menuitem id="menu_admission_test_score"
+            name="Test Scores"
+            parent="menu_test_management_root"
+            action="action_admission_test_score"
+            sequence="30" />
 
         <menuitem id="academy_menu_configuration"
-                  name="Configuration"
-                  parent="academy_root_menu"
-                  sequence="100"/>
+            name="Configuration"
+            parent="academy_root_menu"
+            sequence="100" />
 
         <menuitem id="menu_academy_settings"
-                  name="Settings"
-                  parent="academy_menu_configuration"
-                  action="action_academy_config_settings"
-                  sequence="0"/>
+            name="Settings"
+            parent="academy_menu_configuration"
+            action="action_academy_config_settings"
+            sequence="0" />
 
         <menuitem id="academy_menu_academic_structure"
-                  name="Academic Structure"
-                  parent="academy_menu_configuration"
-                  sequence="10"/>
+            name="Academic Structure"
+            parent="academy_menu_configuration"
+            sequence="10" />
 
         <menuitem id="academy_menu_degree_level"
-                  name="Degree Levels"
-                  parent="academy_menu_academic_structure"
-                  action="action_academy_degree_level"
-                  sequence="1"/>
+            name="Degree Levels"
+            parent="academy_menu_academic_structure"
+            action="action_academy_degree_level"
+            sequence="1" />
 
         <menuitem id="academy_menu_degree"
-                  name="Degrees"
-                  parent="academy_menu_academic_structure"
-                  action="action_academy_degree"
-                  sequence="2"/>
+            name="Degrees"
+            parent="academy_menu_academic_structure"
+            action="action_academy_degree"
+            sequence="2" />
 
         <menuitem id="academy_menu_specialization"
-                  name="Specializations"
-                  parent="academy_menu_academic_structure"
-                  action="action_academy_specialization"
-                  sequence="3"/>
+            name="Specializations"
+            parent="academy_menu_academic_structure"
+            action="action_academy_specialization"
+            sequence="3" />
 
         <menuitem id="menu_academy_program"
-                  name="Programs"
-                  parent="academy_menu_academic_structure"
-                  action="action_academy_program"
-                  sequence="4"/>
+            name="Programs"
+            parent="academy_menu_academic_structure"
+            action="action_academy_program"
+            sequence="4" />
 
         <menuitem id="menu_academy_eligibility"
-                  name="Eligibility Criteria"
-                  parent="academy_menu_academic_structure"
-                  action="action_academy_eligibility"
-                  sequence="5"/>
+            name="Eligibility Criteria"
+            parent="academy_menu_academic_structure"
+            action="action_academy_eligibility"
+            sequence="5" />
 
         <menuitem id="academy_menu_career"
-                  name="Careers"
-                  parent="academy_menu_academic_structure"
-                  action="action_career"
-                  sequence="6"/>
+            name="Careers"
+            parent="academy_menu_academic_structure"
+            action="action_career"
+            sequence="6" />
 
         <menuitem id="academy_menu_campus_management"
-                  name="Campus Management"
-                  parent="academy_menu_configuration"
-                  sequence="20"/>
+            name="Campus Management"
+            parent="academy_menu_configuration"
+            sequence="20" />
 
         <menuitem id="academy_menu_campus"
-                  name="Campuses"
-                  parent="academy_menu_campus_management"
-                  action="action_academy_campus"
-                  sequence="1"/>
+            name="Campuses"
+            parent="academy_menu_campus_management"
+            action="action_academy_campus"
+            sequence="1" />
 
         <menuitem id="academy_menu_institute"
-                  name="Institutes"
-                  parent="academy_menu_campus_management"
-                  action="action_academy_institute"
-                  sequence="2"/>
+            name="Institutes"
+            parent="academy_menu_campus_management"
+            action="action_academy_institute"
+            sequence="2" />
 
         <menuitem id="academy_menu_department"
-                  name="Departments"
-                  parent="academy_menu_campus_management"
-                  action="action_academy_department"
-                  sequence="3"/>
+            name="Departments"
+            parent="academy_menu_campus_management"
+            action="action_academy_department"
+            sequence="3" />
 
         <menuitem id="academy_menu_sessions"
-                  name="Academic Sessions"
-                  parent="academy_menu_configuration"
-                  sequence="30"/>
+            name="Academic Sessions"
+            parent="academy_menu_configuration"
+            sequence="30" />
 
         <menuitem id="academy_menu_academic_session"
-                  name="Sessions"
-                  parent="academy_menu_sessions"
-                  action="action_academic_session"
-                  sequence="1"/>
+            name="Sessions"
+            parent="academy_menu_sessions"
+            action="action_academic_session"
+            sequence="1" />
 
         <menuitem id="academy_menu_term_scheme"
-                  name="Term Schemes"
-                  parent="academy_menu_sessions"
-                  action="action_term_scheme"
-                  sequence="2"/>
+            name="Term Schemes"
+            parent="academy_menu_sessions"
+            action="action_term_scheme"
+            sequence="2" />
 
         <menuitem id="academy_menu_configuration_policy"
-                  name="Aggregate Policies"
-                  parent="academy_menu_configuration"
-                  action="action_academy_aggregate"
-                  sequence="50"/>
-                  <menuitem id="academy_menu_seat_allocation"
-                  name="Seat Allocation"
-                  parent="academy_root_menu"
-                  action="action_academy_seat_allocation"
-                  sequence="60"/>
-             <menuitem id="academy_menu_merit_root"
-                  name="Merit Management"
-                  parent="academy_root_menu"
-                  sequence="61"/>
+            name="Aggregate Policies"
+            parent="academy_menu_configuration"
+            action="action_academy_aggregate"
+            sequence="50" />
+        <menuitem id="academy_menu_seat_allocation"
+            name="Seat Allocation"
+            parent="academy_root_menu"
+            action="action_academy_seat_allocation"
+            sequence="60" />
+        <menuitem id="academy_menu_merit_root"
+            name="Merit Management"
+            parent="academy_root_menu"
+            sequence="61" />
 
         <menuitem id="academy_menu_merit_selection"
-                  name="Master Merit List"
-                  parent="academy_menu_merit_root"
-                  action="action_merit_selection_register"
-                  sequence="62"/>
+            name="Master Merit List"
+            parent="academy_menu_merit_root"
+            action="action_merit_selection_register"
+            sequence="62" />
     </data>
 </odoo>
