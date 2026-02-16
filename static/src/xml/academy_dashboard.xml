@@ -3,18 +3,62 @@
         <div class="o_academy_dashboard">
             <div class="container-fluid px-4">
                 <div class="row align-items-center mb-4 pt-4">
-                    <div class="col-12">
-                        <h3 class="m-0 text-dark fw-bold border-start border-primary border-5 ps-3">
-                            Admission Dashboard
-                        </h3>
+                    <div class="col-md-4">
+                        <h3 class="m-0 text-dark fw-bold border-start border-primary border-5 ps-3">Admission Dashboard</h3>
+                    </div>
+                    <div class="col-md-8 d-flex justify-content-end gap-2">
+                        <select class="form-select w-auto shadow-sm" t-on-change="onTypeChange">
+                            <option value="all">All Registers</option>
+                            <option value="active">Active (Gathering/Merit)</option>
+                        </select>
+                        <select class="form-select w-auto shadow-sm" t-on-change="onRegisterChange">
+                            <option value="all">Select Specific Register</option>
+                            <t t-foreach="state.registers" t-as="r" t-key="r.id">
+                                <option t-att-value="r.id" t-esc="r.name"/>
+                            </t>
+                        </select>
                     </div>
                 </div>
-                
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-primary text-white">
+                            <div class="card-body">
+                                <h6 class="text-light">Total Applications</h6>
+                                <h2 class="text-light" t-esc="state.total_stats.total or 0"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-info text-white">
+                            <div class="card-body">
+                                <h6 class="text-light">Avg Aggregate</h6>
+                                <h2 class="text-light" t-esc="state.total_stats.avg_aggregate or 0"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-success text-white">
+                            <div class="card-body">
+                                <h6 class="text-light">Highest Aggregate</h6>
+                                <h2 class="text-light" t-esc="state.total_stats.highest_aggregate or 0"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card shadow-sm border-0 bg-dark text-white">
+                            <div class="card-body">
+                                <div class="small">M: <t t-esc="state.total_stats.male or 0"/> | F: <t t-esc="state.total_stats.female or 0"/> | O: <t t-esc="state.total_stats.other or 0"/></div>
+                                <h6 class="text-light mt-1">Gender Distribution</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row g-4 mb-5">
                     <t t-foreach="state.app" t-as="c" t-key="c.key">
                         <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-                            <div class="card h-100 shadow-sm border-0 cursor-pointer" 
-                                 t-on-click="() => this.openFilter('state', c.key)">
+                            <div class="card h-100 shadow-sm border-0 cursor-pointer" t-on-click="() => this.openFilter('state', c.key)">
                                 <div class="card-body p-4">
                                     <span class="text-uppercase text-muted fw-semibold small mb-2 d-block" t-esc="c.title"/>
                                     <strong class="h2 mb-0 fw-bold text-dark" t-esc="c.value"/>
@@ -25,16 +69,11 @@
                 </div>
 
                 <div class="voucher-status-section">
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <h4 class="text-secondary fw-semibold">Voucher Status</h4>
-                        </div>
-                    </div>
+                    <h4 class="text-primary fw-semibold mb-3">Voucher Status</h4>
                     <div class="row g-4 mb-5">
                         <t t-foreach="state.voucher" t-as="v" t-key="v.key">
                             <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-                                <div class="card h-100 shadow-sm border-0 cursor-pointer" 
-                                     t-on-click="() => this.openFilter('voucher_state', v.key)">
+                                <div class="card h-100 shadow-sm border-0 cursor-pointer" t-on-click="() => this.openFilter('voucher_state', v.key)">
                                     <div class="card-body p-4">
                                         <span class="text-uppercase text-muted fw-semibold small mb-2 d-block" t-esc="v.title"/>
                                         <strong class="h2 mb-0 fw-bold text-dark" t-esc="v.value"/>
