@@ -4,15 +4,14 @@ import { registry } from "@web/core/registry";
 import { Component, onWillStart, onMounted, useState, useRef } from "@odoo/owl";
 import { loadBundle } from "@web/core/assets";
 import { rpc } from "@web/core/network/rpc";
+import { useService } from "@web/core/utils/hooks";
 
 class AcademyDashboard extends Component {
     setup() {
-        this.state = useState({ 
-            app: [], 
-            voucher: [] 
-        });
+        this.state = useState({ app: [], voucher: [] });
         this.appChartRef = useRef("appChart");
         this.voucherChartRef = useRef("voucherChart");
+        this.actionService = useService("action");
 
         onWillStart(async () => {
             await loadBundle("web.chartjs_lib");
@@ -71,9 +70,15 @@ class AcademyDashboard extends Component {
         }
     }
 
-    openFilter(field, value) {
-        const url = `/academy/dashboard/filter?field=${field}&value=${value}`;
-        window.location.href = url;
+    async openFilter(field, value) {
+        this.actionService.doAction({
+            type: "ir.actions.act_window",
+            name: "Filtered Applications",
+            res_model: "student.application",
+            domain: [[field, "=", value]],
+            views: [[false, "list"], [false, "form"]],
+            target: "current",
+        });
     }
 }
 

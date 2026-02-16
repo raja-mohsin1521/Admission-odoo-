@@ -2,7 +2,6 @@
     <t t-name="odoo19_academy.academy_dashboard_template">
         <div class="o_academy_dashboard">
             <div class="container-fluid px-4">
-                
                 <div class="row align-items-center mb-4 pt-4">
                     <div class="col-12">
                         <h3 class="m-0 text-dark fw-bold border-start border-primary border-5 ps-3">
@@ -58,7 +57,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </t>
